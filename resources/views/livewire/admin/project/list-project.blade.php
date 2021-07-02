@@ -19,19 +19,45 @@
        
         <div class="app-main__inner">
             
+            <div class="app-page-title">
+                @if($listMode)
+                
+                @endif
+                <div class="page-title-wrapper">
+                    <div class="page-title-heading">
+                        <div class="page-title-icon bg-primary">
+                            <i class="pe-7s-paint text-white">
+                            </i>
+                        </div>
+                        <div class="">Projects &nbsp;&nbsp;&nbsp;
+                            <div class="page-title-subheading ">Lorem ipsum dolor sit amet consectetur adipisicing elit. Unde labore eaque blanditiis officia quia nulla..
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>           
         
-            {{-- @if ($updateMode) --}}
+            @if ($createMode)
                 
-            {{-- @include('livewire.admin.position.edit-position') --}}
-            {{-- @else --}}
             @include('livewire.admin.project.create-project')
-    
-            {{-- @endif  --}}
-            
-                
+
+
+            @elseif($updateMode)
+
+            @include('livewire.admin.project.edit-project')
+
+
+            @else
+
+          
             <div class="tab-content">
+                
                 <div class="tab-pane tabs-animation fade show active" id="tab-content-0" role="tabpanel">
-                    
+                    <div class="form-row mb-2">
+                        
+                      
+                    </div>
                     <div class="main-card card ">
                         <div class="card-body">
     
@@ -59,16 +85,25 @@
                                                         
                                                     </div> --}}
                                                 </div>
-                                                <div class="col-md-12 float-right">
+                                                
+                                                <div class="col-md-12 float-right inline-block">
+                                                        <div class="btn btn-dark float-left d-flex mr-3" wire:click="createMode()"> 
+                                                            <i class="pe-7s-plus text-white pr-3"  style="font-size: 20px!important; ">
+                                                            </i>
+                                                            <span style="vertical-align: baseline; margin:auto; font-size:14px; padding-right:25px;">New Project</span>
+                                                        </div>
                                                     <div class="dropdown  float-left">
-                                                        <button type="button" aria-haspopup="true" aria-expanded="true" data-toggle="dropdown" class="mb-2 mr-2 dropdown-toggle btn btn-outline-alternate">Export / Download</button>
+                                                        
+                                                        <button type="button" aria-haspopup="true" aria-expanded="true" data-toggle="dropdown" class="mb-2 mr-2 dropdown-toggle btn btn-outline-alternate">
+                                                            <span style="font-size: 14px;">Export / Download</span>
+                                                        </button>
                                                         <div tabindex="-1" role="menu" aria-hidden="true" class="dropdown-menu" x-placement="bottom-start" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(-7px, 33px, 0px);">
                                                             <button type="button" tabindex="0" class="dropdown-item" wire:click="createPDF()">PDF</button>
                                                             <button type="button" tabindex="0" class="dropdown-item">Excel</button>
                                                           
                                                         </div>
                                                     </div>
-                                                    <div class="search-wrapper active float-right">
+                                                    <div class="search-wrapper  active float-right">
                                                         <div class="input-holder ">
     
                                                             <input type="text" class="search-input " wire:model="searchTerm" placeholder="Type to search">
@@ -79,47 +114,92 @@
                                                    
                                                 </div>
                                             </div>
-                                            <div class=" table-responsive " style="height: 325px;">
+                                            <div class=" table-responsive " style="height: 100%">
                                                 
                                    <table  class="table table-striped table-bordered" id="position-table" >
                                     
                                     <thead>
+                                        <style>
+                                            .text-xs
+                                            {
+                                                font-size: .69rem !important;
+                                                font-weight: 300;
+
+                                            }
+                                            .text-sm
+                                            {
+                                                font-size: .875rem !important;
+                                                font-weight: 500;
+                                            }
+                                            .media-body
+                                            {
+                                                flex: 1 1;
+                                            }
+                                        </style>
                                         <tr>
-                                            <th width="200px">Position Title</th>
-                                            <th>Job Description</th>
-                                            <th width="150px;">Salary Rate <small>(PER DAY)</small></th>
+                                            <th >Project Name</th>
+                                            <th>Owner</th>
+                                            <th >Project Budget <small>(ESTIMATED)</small></th>
+                                            <th>Service Type</th>
+                                            <th class="text-center">Status</th>
+
                                             <th class="text-center" width="150px">Action</th>
                                         </tr>
     
                                     </thead>
                                     <tbody>
-                                        {{-- @if($positions->count() < 1)
-                                            <tr><td colspan="4" class="text-center"><h4>No data found</h4></td></tr>
+                                        @if($projects->count() < 1)
+                                            <tr><td colspan="4" class="text-center"><h4>No projects found</h4></td></tr>
                                         
                                         @endif
-                                        @foreach ($positions as $position)
+                                        @foreach ($projects as $project)
                                         <tr>
                                            
-                                            <td>{{$position->position_title}}</td>
-                                            <td>{{$position->job_description}}</td>
-                                            <td>{{$position->salary_rate}}</td>
+                                            <td>
+                                                <div class="media-body flex items-center">
+                                                    <h2 class="name mb-0 text-sm">{{$project->project_name}}</h2>
+                                                    <p class="text-xs mb-0">{{$project->project_location}}</p>
+
+                                                </div>
+                                            </td>
+                                            <td>{{$project->project_owner}}</td>
+                                            <td><span>&#8369; </span>{{number_format($project->estimated_budget,2)}}</td>
+                                            <td>{{$project->project_type}}</td>
+                                                @if ($project->project_status == "1")
+                                                <td class="text-center">
+                                                    <span class="badge badge-info text-xs"><small>Active</small></span>
+                                                </td>
+                                                @elseif ($project->project_status == "2")
+                                                <td class="text-center">
+                                                    <span class="badge badge-success text-xs"><small>Completed</small></span>
+                                                </td>
+                                                @elseif ($project->project_status == "3")
+                                                <td class="text-center">
+                                                    <span class="badge badge-warning text-xs"><small>Pending</small></span>
+                                                </td>
+                                                @elseif ($project->project_status == "4")
+                                                <td class="text-center">
+                                                    <span class="badge badge-secondary text-xs"><small>Stopped</small></span>
+                                                </td>
+                                                @endif    
                                             <td class="text-center"><div class="dropdown">
                                                 <button type="button" aria-haspopup="true" aria-expanded="false" data-toggle="dropdown" class="dropdown-toggle btn btn-outline-link"></button>
                                                 <div tabindex="-1" role="menu" aria-hidden="true" class="dropdown-menu" x-placement="bottom-start" style="z-index: 999999;position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(0px, 33px, 0px);">
                                                     <h6 tabindex="-1" class="dropdown-header">Actions</h6>
-                                                        <button wire:click="edit({{$position->id}})" tabindex="0" class="dropdown-item">Edit</button>
+                                                        <button wire:click="edit({{$project->id}})" tabindex="0" class="dropdown-item">Edit</button>
                                                     
-                                                    <button wire:click.prevent="$emit('deletePosition',{{$position}})" class="dropdown-item" type="button"> Delete</button>
+                                                    <button wire:click.prevent="$emit('deletePosition',{{$project}})" class="dropdown-item" type="button"> Delete</button>
                                                 </div>
-                                            </div></td>
+                                            </div>
+                                        </td>
                                         </tr>    
-                                        @endforeach --}}
+                                        @endforeach
                                         
                                     </tbody>
                                 </table>
                             </div>
                                   <div class="card-footer justify-content-center">
-                                    {{-- {{$positions->links('pagination')}} --}}
+                                    {{$projects->links('pagination')}}
     
                                   </div>
                                 </div>
@@ -136,6 +216,14 @@
                 </div>
                 
             </div>
+
+
+
+
+            @endif 
+            
+                
+            
         </div>
             
         <script>

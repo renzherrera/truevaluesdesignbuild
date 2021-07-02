@@ -37,9 +37,15 @@
             font-size: 12px;
             margin-top: -5px;
         }
+        h5 {
+            padding-top: 25px;
+        }
 </style>
    
     <div class="col-md-12 ">
+        <h5 class=" mb-2 text-center"><strong>List of Positions</strong></h5>
+
+
         <table  class="table table-striped table-bordered " >
                                 
             <thead>

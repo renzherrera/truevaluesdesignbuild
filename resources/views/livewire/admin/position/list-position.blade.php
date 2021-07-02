@@ -102,7 +102,7 @@
                                        
                                         <td>{{$position->position_title}}</td>
                                         <td>{{$position->job_description}}</td>
-                                        <td>{{$position->salary_rate}}</td>
+                                        <td><span>&#8369; </span>{{number_format($position->salary_rate,2)}}</td>
                                         <td class="text-center"><div class="dropdown">
                                             <button type="button" aria-haspopup="true" aria-expanded="false" data-toggle="dropdown" class="dropdown-toggle btn btn-outline-link"></button>
                                             <div tabindex="-1" role="menu" aria-hidden="true" class="dropdown-menu" x-placement="bottom-start" style="z-index: 999999;position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(0px, 33px, 0px);">

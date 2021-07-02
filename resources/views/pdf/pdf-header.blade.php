@@ -14,7 +14,6 @@
          <h6 class="">Address: Saint Matthew Street, St. Francis Village, Dolores, City of San Fernando, Pampanga</h6>
          <h6>Email: truevalue.designersnbuilders@gmail.com</h6>
           
-         <h5 class="mt-4 mb-2"><strong>List of Positions</strong></h5>
  
      </div>
 </body>

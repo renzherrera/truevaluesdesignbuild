@@ -40,7 +40,7 @@ return [
 
         'timeout' => false,
         'options' => ["enable-local-file-access" => true ,
-                'margin-top'    => 45,
+                'margin-top'    => 35,
                 'margin-right'  => 10,
                 'margin-bottom' => 15,
                 'margin-left'   => 10,

@@ -6,12 +6,14 @@
     <div class="tab-content">
         <div class="tab-pane tabs-animation fade show active" id="tab-content-0" role="tabpanel">
             <div class="main-card mb-2 card">
-                <div class="card-body m-3"><h5 class="card-title ">New Projects</h5>
+                <div class="card-body m-3"><h5 class="card-title ">Edit Project Details</h5>
                     {{-- <form action="{{route('admin.positions.store')}}" method="POST"> --}}
                         {{-- @csrf --}}
                         {{-- <div class="form-row">
                             <input type="file" name="" id="">
                         </div> --}}
+                        <input name="selected_id" wire:model="selected_id"  type="text" class="form-control" hidden readonly>
+
                         <div class="form-row container-fluid pb-4">
                            
                             <div class="col-md-4">
@@ -96,8 +98,8 @@
                             </div> 
                         </div>
 
-                            <button wire:click.prevent="store()" class=" btn btn-info px-5 py-2  float-right">Create Project</button>
-                            <button wire:click.prevent="listMode()" class=" btn btn-warning px-5 py-2 mr-3  float-right">Return to List</button>
+                            <button wire:click.prevent="update()" class=" btn btn-primary px-5 py-2  float-right">Save Changes</button>
+                            <button wire:click.prevent="listMode()" class=" btn btn-warning px-5 py-2 mr-3  float-right">Cancel</button>
 
                        
                     {{-- </form> --}}
@@ -114,23 +116,6 @@
     
 
 
-{{-- <script type="text/javascript">
-    $(function () {
-      
-      var table = $('.data-table').DataTable({
-          processing: true,
-          serverSide: true,
-          ajax: "{{ route('admin.positions.index') }}",
-          columns: [
-              {data: 'position_title', name: 'position_title'},
-              {data: 'job_description', name: 'job_description'},
-              {data: 'salary_rate', name: 'salary_rate'},
-              {data: 'action', name: 'action', orderable: false, searchable: false},
-          ]
-      });
-      
-    });
-  </script> --}}
 
 
 
