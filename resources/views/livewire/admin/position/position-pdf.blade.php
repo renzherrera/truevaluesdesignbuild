@@ -67,7 +67,7 @@
                    <td>{{$position->id}}</td>
                     <td width="500px">{{$position->position_title}}</td>
                     {{-- <td>{{$position->job_description}}</td> --}}
-                    <td><span>&#8369; </span> {{$position->salary_rate}}</td>
+                    <td><span>&#8369; </span>{{number_format($position->salary_rate,2)}}</td>
                     
                 </tr>    
                 @endforeach
