@@ -35,14 +35,14 @@
                 <li class="app-sidebar__heading"></li>
                 <li>
                     <a href="{{route('home')}}" class="mm-active">
-                        <i class="metismenu-icon pe-7s-rocket"></i>
+                        <i class="metismenu-icon pe-7s-display1"></i>
                         Dashboard
                     </a>
                 </li>
                 <li class="app-sidebar__heading"></li>
                 <li>
                     <a href="#">
-                        <i class="metismenu-icon pe-7s-diamond"></i>
+                        <i class="metismenu-icon pe-7s-users"></i>
                         Employees
                         <i class="metismenu-state-icon pe-7s-angle-down caret-left"></i>
                     </a>
@@ -97,36 +97,12 @@
                             </a>
                         </li>
                         <li>
-                            <a >
+                                <a href="{{route('admin.list-projects')}}">
                                 <i class="metismenu-icon">
                                 </i>Projects
-                        <i class="metismenu-state-icon pe-7s-angle-down caret-left"></i>
 
                             </a>
-                            <ul>
-                        
-                                <li>
-                                    <a href="{{route('admin.list-projects')}}">
-                                        <i class="metismenu-icon">
-                                        </i>New Project
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="elements-buttons-standard.html">
-                                        <i class="metismenu-icon"></i>
-                                        List of Projects
-                                    </a>
-                                </li>
-                                {{-- <li>
-                                    <a href="elements-icons.html">
-                                        <i class="metismenu-icon">
-                                        </i>Payroll
-                                    </a>
-                                </li> --}}
-        
-                                
-                                
-                            </ul>
+                            
                         </li>
                     </ul>
                 </li>
