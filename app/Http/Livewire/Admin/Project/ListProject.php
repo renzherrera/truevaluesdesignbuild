@@ -26,7 +26,7 @@ class ListProject extends Component
 
         $services = Service::select('id','service_name')->get();
         $searchTerm='%'.$this->searchTerm . '%';
-        $projects = Project::with('projectService')->where('project_name', 'LIKE', $searchTerm )
+        $projects = Project::where('project_name', 'LIKE', $searchTerm )
                     ->paginate(5);
         return view('livewire.admin.project.list-project',compact('projects','services','selected'))->layout('layouts.master');
     }
@@ -140,7 +140,6 @@ class ListProject extends Component
         $this->validate([
             'project_name' => 'required',
             'project_owner' => 'required',      
-            'project_type' => 'required',
             'project_location' => 'required',
             'project_status' => 'required',
             'project_description' => 'required',
@@ -189,8 +188,7 @@ class ListProject extends Component
     
     public function createPDF()
     {
-       $projects = DB::table('projects')
-        ->orderBy('id','desc')
+       $projects = Project::orderBy('id','desc')
         ->get();
         // $projects = Project::join('project_images','projects.id','=','project_images.project_id');
         view()->share('projects',$projects);

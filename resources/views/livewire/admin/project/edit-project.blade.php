@@ -60,7 +60,7 @@
                                 <div class="form-group" >
                                     <label for="project_type" class="">Services</label>
                                     <div wire:ignore>
-                                    <select name="project_type[]" style="width: 100%;" id="project_type" class="form-control" select2-hidden-accessible multiple   required >
+                                    <select name="project_type[]" style="width: 100%;" id="project_type" class="form-control" select2-hidden-accessible multiple >
                                         @foreach ($services as $service)
                                         <option value="{{$service->id}}"
 

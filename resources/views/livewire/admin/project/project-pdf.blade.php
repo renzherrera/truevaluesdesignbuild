@@ -68,11 +68,11 @@
             <thead>
                 <tr>
                     <th style="width: 30px;" class="text-center"></th>
-                    <th style="width: 300px;">Project Name</th>
-                    <th style="width: 150px;">Owner</th>
-                    <th style="width: 150px;">Estimated Budget</th>
-                    <th class="title-col">Service</th>
-                    <th class="title-col">Status</th>
+                    <th style="width: 100%;">Project Name</th>
+                    <th style="width: 100%;">Owner</th>
+                    <th style="width: 100%;">Estimated Budget</th>
+                    <th style="width: 100%;">Service</th>
+                    <th style="width: 100%;">Status</th>
 
                     {{-- <th>Job Description</th> --}}
                 </tr>
@@ -94,22 +94,37 @@
                                             </td>
                                             <td>{{$project->project_owner}}</td>
                                             <td><span>&#8369; </span>{{number_format($project->estimated_budget,2)}}</td>
-                                            <td>{{$project->project_type}}</td>
+                                            
+                                            <td>
+                                                @foreach ($project->services as $projectServicetype)
+                                                        @if ($project->count() < 2)
+                                                        {{$projectServicetype->service_name}}
+                                                        @elseif (!$loop->last)
+                                                        {{$projectServicetype->service_name}},
+
+                                                        @else
+                                                        {{$projectServicetype->service_name}}
+
+                                                        @endif
+                                                @endforeach
+                                             </td>
+
+
                                                 @if ($project->project_status == "1")
                                                 <td class="text-center">
-                                                    <span class="badge badge-info text-xs"><small>Active</small></span>
+                                                    <span class="badge ">Active</span>
                                                 </td>
                                                 @elseif ($project->project_status == "2")
                                                 <td class="text-center">
-                                                    <span class="badge badge-success text-xs"><small>Completed</small></span>
+                                                    <span class="badge ">Completed</span>
                                                 </td>
                                                 @elseif ($project->project_status == "3")
                                                 <td class="text-center">
-                                                    <span class="badge badge-warning text-xs"><small>Pending</small></span>
+                                                    <span class="badge ">Pending</span>
                                                 </td>
                                                 @elseif ($project->project_status == "4")
                                                 <td class="text-center">
-                                                    <span class="badge badge-secondary text-xs"><small>Stopped</small></span>
+                                                    <span class="badge  ">Stopped</span>
                                                 </td>
                                                 @endif    
                                         </tr>    
