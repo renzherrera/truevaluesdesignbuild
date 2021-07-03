@@ -3,6 +3,8 @@
 namespace App\Http\Livewire\Admin\Project;
 
 use App\Models\Project;
+use App\Models\ProjectService;
+use App\Models\Service;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -10,15 +12,23 @@ use PDF;
 class ListProject extends Component
 {
     public $updateMode = false, $createMode = false, $listMode = true,
-    $project_name,$project_owner, $project_type,$project_started=null,$project_ended=null,
+    $project_name,$project_owner, $project_started=null,$project_ended=null,
     $project_location,$project_status, $project_description,$estimated_budget, $searchTerm, $selected_id;
+    public $project_type =[];
     use WithPagination;
     public function render()
     {
+        $selected = null;
+        if($this->selected_id){
+            $selected = Project::with('services')->findOrFail($this->selected_id);
+
+        }
+
+        $services = Service::select('id','service_name')->get();
         $searchTerm='%'.$this->searchTerm . '%';
-        $projects = Project::where('project_name', 'LIKE', $searchTerm )
+        $projects = Project::with('projectService')->where('project_name', 'LIKE', $searchTerm )
                     ->paginate(5);
-        return view('livewire.admin.project.list-project',compact('projects'))->layout('layouts.master');
+        return view('livewire.admin.project.list-project',compact('projects','services','selected'))->layout('layouts.master');
     }
 
      
@@ -27,7 +37,7 @@ class ListProject extends Component
         $this->validate([
             'project_name' => 'required',
             'project_owner' => 'required',      
-            'project_type' => 'required',
+            // 'project_type' => 'required',
             'project_location' => 'required',
             'project_status' => 'required',
             'project_description' => 'required',
@@ -35,7 +45,7 @@ class ListProject extends Component
         $project = Project::create([
             'project_name' => $this->project_name,
             'project_owner' => $this->project_owner,
-            'project_type' => $this->project_type,
+            'project_type' => json_encode($this->project_type),
             'project_started' => $this->project_started !== null ? date('Y-m-d H:i:s', strtotime($this->project_started)) : null,
             'project_ended' => $this->project_ended !== null ? date('Y-m-d H:i:s', strtotime($this->project_ended)) : null,
             'project_location' => $this->project_location,
@@ -44,13 +54,33 @@ class ListProject extends Component
             'estimated_budget' => $this->estimated_budget,
         ]);
 
+        // encoded type so I can loop json array 
+        $type =  json_encode($this->project_type);
+       //decoded to get each values and insert
+        $service_types = json_decode($type,true);
 
+        foreach($service_types as $key){
+           $project->services()->attach($key);
+
+        }
+
+
+        // foreach($service_types as $key){
+        //     ProjectService::create([
+        //         'project_id' => $project->id,
+        //         'service_id' => $key,
+        //     ]);
+
+        // }
+        
+        $this->resetInputFields();
+
+        $this->emit('productServiceStore');
         $this->emit('swal:modal', [
             'icon'  => 'success',
             'title' => 'Success!!',
             'text'  => "New Project Added",
         ]);
-        $this->resetInputFields();
 
        
     //   return redirect()->route('admin.positions.create');  
@@ -68,7 +98,7 @@ class ListProject extends Component
         $this->project_location='';
         $this->project_description='';
         $this->estimated_budget='0.0';
-        // $this->images=[];
+        $this->project_type=null;
 
     
     }
@@ -91,17 +121,19 @@ class ListProject extends Component
         $this->updateMode = true;
         $this->listMode = false;
 
-        $projects = Project::findOrFail($id);
+        $projects = Project::with('services')->findOrFail($id);
         $this->selected_id = $id;
         $this->project_name = $projects->project_name;
         $this->project_owner = $projects->project_owner;
-        $this->project_type= $projects->project_type;
+        // $this->project_type= $projects->project_type;
         $this->project_status= $projects->project_status;
         $this->project_started=$projects->project_started;
         $this->project_ended=$projects->project_ended;
         $this->project_location=$projects->project_location;
         $this->project_description=$projects->project_description;
         $this->estimated_budget=$projects->estimated_budget;
+        $this->dispatchBrowserEvent('reApplySelect2');
+
     }
 
     public function update() {
@@ -118,7 +150,7 @@ class ListProject extends Component
         $project->update([
             'project_name' => $this->project_name,
             'project_owner' => $this->project_owner,
-            'project_type' => $this->project_type,
+            // 'project_type' => $this->project_type,
             'project_started' => $this->project_started !== null ? date('Y-m-d H:i:s', strtotime($this->project_started)) : null,
             'project_ended' => $this->project_ended !== null ? date('Y-m-d H:i:s', strtotime($this->project_ended)) : null,
             'project_location' => $this->project_location,
@@ -126,6 +158,19 @@ class ListProject extends Component
             'project_description' => $this->project_description,
             'estimated_budget' => $this->estimated_budget,
         ]);
+        // encoded type so I can loop json array 
+        $type =  json_encode($this->project_type);
+       //decoded to get each values and insert
+        $service_types = json_decode($type,true);
+       
+        if($service_types){
+            $project->services()->sync($service_types);
+
+        }
+            
+
+      
+        
         $this->updateMode = false;
 
 

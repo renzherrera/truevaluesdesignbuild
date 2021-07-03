@@ -1,4 +1,5 @@
 <div>
+   
     <title>List of Positions | True Values</title>
     <style>
         nav svg{
@@ -54,10 +55,7 @@
             <div class="tab-content">
                 
                 <div class="tab-pane tabs-animation fade show active" id="tab-content-0" role="tabpanel">
-                    <div class="form-row mb-2">
-                        
-                      
-                    </div>
+                    
                     <div class="main-card card ">
                         <div class="card-body">
     
@@ -164,7 +162,20 @@
                                             </td>
                                             <td>{{$project->project_owner}}</td>
                                             <td><span>&#8369; </span>{{number_format($project->estimated_budget,2)}}</td>
-                                            <td>{{$project->project_type}}</td>
+                                         
+                                            <td>
+                                                @foreach ($project->services as $projectServicetype)
+                                                        @if ($project->count() < 2)
+                                                        {{$projectServicetype->service_name}}
+                                                        @elseif (!$loop->last)
+                                                        {{$projectServicetype->service_name}},
+
+                                                        @else
+                                                        {{$projectServicetype->service_name}}
+
+                                                        @endif
+                                                @endforeach
+                                             </td>
                                                 @if ($project->project_status == "1")
                                                 <td class="text-center">
                                                     <span class="badge badge-info text-xs"><small>Active</small></span>

@@ -104,6 +104,14 @@
                             </a>
                             
                         </li>
+                        <li>
+                            <a href="{{route('admin.list-services')}}">
+                            <i class="metismenu-icon">
+                            </i>Services
+
+                        </a>
+                        
+                    </li>
                     </ul>
                 </li>
                 {{-- <li>

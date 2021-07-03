@@ -56,17 +56,32 @@
                                 </div>
                             </div> 
 
-                            <div class="col-md-3">
-                                <div class="form-group">
-                                    <label for="project_type" class="">Service Type</label>
-                                    <select name="project_type" id="project_type" wire:model="project_type"  type="text" class="form-control" required>
-                                        <option value="">-- Select service</option>
-                                        <option value="1">Renovation</option>
-                                        <option value="2">Build</option>
-                                        <option value="3">Design</option>
-                                        <option value="4">Design & Build</option>
+                            <div class="col-md-3" >
+                                <div class="form-group" >
+                                    <label for="project_type" class="">Services</label>
+                                    <div wire:ignore>
+                                    <select name="project_type[]" style="width: 100%;" id="project_type" class="form-control" select2-hidden-accessible multiple   required >
+                                        @foreach ($services as $service)
+                                        <option value="{{$service->id}}"
+
+                                            {{-- the project type is encoded already, we don't have to initiate a encode value. --}}
+
+                                            @foreach ($selected->services as $selectedProject)
+
+                                                
+                                            @if ($service->id == $selectedProject->id)
+                                                selected
+                                            @endif
+                                            
+                                            @endforeach
+                                            
+                                            >{{$service->service_name}}</option>
+                                        @endforeach
                                     </select>
+
+                                    </div>
                                     @error('project_type') <span class="text-danger">{{ $message }}</span> @enderror
+
                                 </div>
                             </div> 
                             <div class="col-md-6">
@@ -109,14 +124,33 @@
 
                 </div>
             </div>
-
         </div>
-        
     </div>
-    
-
-
-
+    <script>
+        $(document).ready(function () {
+            window.addEventListener('reApplySelect2', event => {
+                let data = $(this).val();
+                 @this.set('project_type', data);
+        });
+            $('#project_type').select2({
+                allowClear: true,
+                placeholder: 'Select a type of service'
+            });
+            $('#project_type').on('select2:select', function (e) {
+                let data = $(this).val();
+                 @this.set('project_type', data);
+            });
+           
+            window.livewire.on('productServiceStore', () => {
+                $('#project_type').select2();
+                // $('#project_type').select2().val('').change();
+            });
+            window.livewire.on('bindModel', () => {
+                let data = $(this).val();
+                 @this.set('project_type', data);
+            });
+        });  
+    </script>
 
 
 </div>

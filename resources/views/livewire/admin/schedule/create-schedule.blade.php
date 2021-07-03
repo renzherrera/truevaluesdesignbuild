@@ -1,20 +1,7 @@
 <div>
 
    
-    <div class="app-page-title">
-        <div class="page-title-wrapper">
-            <div class="page-title-heading">
-                <div class="page-title-icon bg-info">
-                    <i class="pe-7s-date text-white">
-                    </i>
-                </div>
-                <div>Schedules
-                    <div class="page-title-subheading">Lorem ipsum dolor sit amet consectetur adipisicing elit. Unde labore eaque blanditiis officia quia nulla..
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>           
+          
 
         
     <div class="tab-content">

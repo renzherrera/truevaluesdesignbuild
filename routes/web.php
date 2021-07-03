@@ -6,6 +6,7 @@ use App\Http\Livewire\Admin\NewEmployee;
 use App\Http\Livewire\Admin\Position\ListPosition;
 use App\Http\Livewire\Admin\Project\ListProject;
 use App\Http\Livewire\Admin\Schedule\ListSchedule;
+use App\Http\Livewire\Admin\Service\ListService;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -33,6 +34,7 @@ Route::group(['middleware'=> 'auth'], function(){
     Route::get('list-position',ListPosition::class)->name('list-position');
     Route::get('list-schedule',ListSchedule::class)->name('list-schedule');
     Route::get('list-projects',ListProject::class)->name('list-projects');
+    Route::get('list-services',ListService::class)->name('list-services');
     
         //  Route::resource('positions', PositionController::class);
     

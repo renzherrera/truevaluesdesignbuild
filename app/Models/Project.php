@@ -21,4 +21,12 @@ class Project extends Model
         'estimated_budget'
 
     ];
+
+    public function projectService(){
+        return $this->hasMany(ProjectService::class);
+    }
+
+    public function services() {
+        return $this->belongsToMany(Service::class);
+    }
 }
