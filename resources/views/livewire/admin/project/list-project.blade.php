@@ -63,8 +63,8 @@
                                 <div class="col-sm-12  date-filter" style="width: 100%">
                                             
                                             <div class="form-row ">
-                                                <div class="col-md-4 ">
-                                                <h4 class="card-title">List of Positions</h4>
+                                                <div class="col-md-4">
+                                                <h4 class="card-title">List of Projects</h4>
                                                 
     
                                                     {{-- <div class="form-row input-daterange">
@@ -147,7 +147,7 @@
                                     </thead>
                                     <tbody>
                                         @if($projects->count() < 1)
-                                            <tr><td colspan="4" class="text-center"><h4>No projects found</h4></td></tr>
+                                            <tr><td colspan="6" class="text-center"><h4>No projects found</h4></td></tr>
                                         
                                         @endif
                                         @foreach ($projects as $project)

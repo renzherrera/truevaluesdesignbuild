@@ -53,12 +53,18 @@
                                     @error('project_ended') <span class="text-danger">{{ $message }}</span> @enderror
                                 </div>
                             </div> 
-                            
+                            <select class="selectpicker" multiple>
+                                <option>Mustard</option>
+                                <option>Ketchup</option>
+                                <option>Relish</option>
+                              </select>
+                              
+                              
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="project_status" class="">Status</label>
                                     <select name="project_status" id="project_status" wire:model.defer="project_status"  type="text" class="form-control"  required>
-                                        <option value="">-- Select status --</option>
+                                        <option value="" disabled>-- Select status --</option>
                                         <option value="1">Active</option>
                                         <option value="2">Completed</option>
                                         <option value="3">Pending</option>
@@ -80,7 +86,7 @@
                                 <div class="form-group" >
                                     <label for="project_type" class="">Services</label>
                                     <div wire:ignore>
-                                    <select name="project_type[]" style="width: 100%;" id="project_type" class="form-control" select2-hidden-accessible multiple  required >
+                                    <select name="project_type[]" style="width: 100%;" id="project_type" wire:model.defer="project_type" class="form-control" select2-hidden-accessible multiple  required >
                                         @foreach ($services as $service)
                                         <option value="{{$service->id}}">{{$service->service_name}}</option>
                                         @endforeach
@@ -123,6 +129,7 @@
 
     <script>
         $(document).ready(function () {
+    $('#project_status').selectpicker();
           
             $('#project_type').select2({
                 allowClear: true,

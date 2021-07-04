@@ -23,6 +23,7 @@ class ListProject extends Component
             $selected = Project::with('services')->findOrFail($this->selected_id);
 
         }
+        
 
         $services = Service::select('id','service_name')->get();
         $searchTerm='%'.$this->searchTerm . '%';
@@ -132,7 +133,7 @@ class ListProject extends Component
         $this->project_location=$projects->project_location;
         $this->project_description=$projects->project_description;
         $this->estimated_budget=$projects->estimated_budget;
-        $this->dispatchBrowserEvent('reApplySelect2');
+
 
     }
 
@@ -159,11 +160,11 @@ class ListProject extends Component
         ]);
         // encoded type so I can loop json array 
         $type =  json_encode($this->project_type);
+
        //decoded to get each values and insert
         $service_types = json_decode($type,true);
-       
         if($service_types){
-            $project->services()->sync($service_types);
+            $project->services()->sync($service_types,true);
 
         }
             
