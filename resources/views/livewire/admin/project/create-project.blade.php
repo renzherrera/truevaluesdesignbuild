@@ -53,18 +53,13 @@
                                     @error('project_ended') <span class="text-danger">{{ $message }}</span> @enderror
                                 </div>
                             </div> 
-                            <select class="selectpicker" multiple>
-                                <option>Mustard</option>
-                                <option>Ketchup</option>
-                                <option>Relish</option>
-                              </select>
-                              
+                            
                               
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="project_status" class="">Status</label>
-                                    <select name="project_status" id="project_status" wire:model.defer="project_status"  type="text" class="form-control"  required>
-                                        <option value="" disabled>-- Select status --</option>
+                                    <select name="project_status" id="project_status" wire:model.defer="project_status"  type="text" class="form-control " title="Select Project Status"  required>
+                                        <option value="" >-- Select status --</option>
                                         <option value="1">Active</option>
                                         <option value="2">Completed</option>
                                         <option value="3">Pending</option>
@@ -123,13 +118,11 @@
         
     </div>
     
-@push('scripts')
-    
-@endpush
+
 
     <script>
         $(document).ready(function () {
-    $('#project_status').selectpicker();
+    // $('#project_status').selectpicker();
           
             $('#project_type').select2({
                 allowClear: true,

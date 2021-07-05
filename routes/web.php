@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\EmployeeController;
+use App\Http\Livewire\Admin\Employee\ListEmployee;
 use App\Http\Livewire\Admin\Employees;
 use App\Http\Livewire\Admin\NewEmployee;
 use App\Http\Livewire\Admin\Position\ListPosition;
@@ -30,7 +31,7 @@ Route::group(['middleware'=> 'auth'], function(){
         //  Route::post('admin/settings/save-settings',[SettingsController::class,'update'])->name('settings.update');
         //  Route::get('register-employee',[Employees::class,'create'])->name('employees.create');
 
-    Route::get('new-employee',NewEmployee::class)->name('newEmployee');
+    Route::get('list-employees',ListEmployee::class)->name('list-employees');
     Route::get('list-position',ListPosition::class)->name('list-position');
     Route::get('list-schedule',ListSchedule::class)->name('list-schedule');
     Route::get('list-projects',ListProject::class)->name('list-projects');

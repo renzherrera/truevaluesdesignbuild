@@ -49,7 +49,7 @@
                     <ul>
                         
                         <li>
-                            <a href="{{route('admin.newEmployee')}}">
+                            <a href="{{route('admin.list-employees')}}">
                                 <i class="metismenu-icon">
                                 </i>Add Employee
                             </a>
