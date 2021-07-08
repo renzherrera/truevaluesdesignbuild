@@ -23,11 +23,11 @@ class CreateEmployeesTable extends Migration
             $table->string('gender');
             $table->foreignId('position_id')->constrained();
             $table->foreignId('schedule_id')->constrained();
-            $table->foreignId('project_id')->constrained();
+            $table->unsignedBigInteger('project_id')->index()->nullable();
+            $table->foreign('project_id')->references('id')->on('projects')->onUpdate('cascade')->onDelete('SET NULL');
             $table->text('address');
             $table->string('status');
-            $table->string('image')->nullable;
-
+            $table->string('image')->nullable();
             $table->timestamps();
         });
     }

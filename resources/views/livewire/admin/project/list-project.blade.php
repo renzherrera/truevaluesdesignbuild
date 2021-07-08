@@ -253,11 +253,7 @@
                         if (result.value) {
                             // calling destroy method to delete
                             @this.call('destroy',id)
-                            Swal.fire(
-                                'Deleted!',
-                                'Data has been deleted.',
-                                'success'
-                            )
+                           
                         } else if (result.dismiss === Swal.DismissReason.cancel) {
                             Swal.fire(
                                 'Cancelled',

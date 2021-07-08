@@ -90,5 +90,9 @@ class ListSchedule extends Component
         $this->start_time = '';
         $this->end_time = '';
     }
+    public function updatingSearchTerm(): void
+    {
+        $this->gotoPage(1);
+    }
 
 }

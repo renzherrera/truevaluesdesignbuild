@@ -36,14 +36,14 @@
                                 <div class="col-md-6">
                                     <div class="position-relative form-group">
                                         <label for="position_title" class="">Position Title</label>
-                                        <input name="position_title" id="position_title" wire:model="position_title"  type="text" class="form-control" required>
+                                        <input name="position_title" id="position_title" wire:model.defer="position_title"  type="text" class="form-control" required>
                                     </div>
                                 </div>
                                  
                                 <div class="col-md-6">
                                     <div class="position-relative form-group">
                                         <label for="salary_rate" class="">Salary Rate</label>
-                                        <input class="form-control" wire:model="salary_rate"  type="number" step='0.01' value='0.00' id="salary_rate" name="salary_rate" placeholder='0.00' required/>
+                                        <input class="form-control" wire:model.defer="salary_rate"  type="number" step='0.01' value='0.00' id="salary_rate" name="salary_rate" placeholder='0.00' required/>
                                     </div>
                                 </div>
                             </div>
@@ -51,7 +51,7 @@
                                 <div class="col-md-6">
                                     <div class="position-relative form-group">
                                         <label for="job_description" class="">Job Description</label>
-                                        <textarea wire:model="job_description"  name="job_description" id="job_description"  class="form-control" required> </textarea>
+                                        <textarea wire:model.defer="job_description"  name="job_description" id="job_description"  class="form-control" required> </textarea>
                                     </div>
                                 </div> 
                             </div>

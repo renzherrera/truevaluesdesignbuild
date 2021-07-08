@@ -5,6 +5,7 @@ namespace App\Http\Livewire\Admin\Project;
 use App\Models\Project;
 use App\Models\ProjectService;
 use App\Models\Service;
+use Exception;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -184,7 +185,22 @@ class ListProject extends Component
     }
     
     public function destroy(Project $project) {
-        $project->delete();
+        try{
+            $project->delete();
+            $this->emit('swal:modal', [
+                'icon'  => 'success',
+                'title' => 'Success!!',
+                'text'  => "{$project->project_name} successfully deleted",
+            ]);
+        }catch(Exception $ex){
+
+            $this->emit('swal:modal', [
+                'icon'  => 'error',
+                'title' => 'Error!!',
+                'text'  => "Unable to delete {$project->project_name}.",
+            ]);
+        }
+      
     }
     
     public function createPDF()
@@ -198,5 +214,10 @@ class ListProject extends Component
        $pdf->setOption('header-html', view('pdf.pdf-header'));
         return $pdf->stream('projects.pdf');
     }
+    public function updatingSearchTerm(): void
+    {
+        $this->gotoPage(1);
+    }
+
 
 }

@@ -14,7 +14,7 @@
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="service_name" class="">Service Name</label>
-                                    <input name="service_name" id="service_name" wire:model="service_name"  type="text" class="form-control" required>
+                                    <input id="service_name" wire:model.defer="service_name"  type="text" class="form-control" required>
                                     @error('position_title') <span class="text-danger">{{ $message }}</span> @enderror
                                 </div>
                             </div>
@@ -23,7 +23,7 @@
                             <div class="col-md-12">
                                 <div class="position-relative form-group">
                                     <label for="job_description" class="">Service Description</label>
-                                    <textarea wire:model="service_description" style="  height:  40px;" name="service_description" id="service_description"  class="form-control" required></textarea>
+                                    <textarea wire:model.defer="service_description" style="  height:  40px;" name="service_description" id="service_description"  class="form-control" required></textarea>
                                     @error('job_description') <span class="text-danger">{{ $message }}</span> @enderror
 
                                 </div>

@@ -15,7 +15,7 @@
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="schedule_title" class="">Schedule Title</label>
-                                    <input name="schedule_title" id="schedule_title" wire:model="schedule_title"  type="text" class="form-control" required>
+                                    <input name="schedule_title" id="schedule_title" wire:model.defer="schedule_title"  type="text" class="form-control" required>
                                     @error('schedule_title') <span class="text-danger">{{ $message }}</span> @enderror
                                 </div>
                             </div>
@@ -24,7 +24,7 @@
                             <div class="col-md-4">
                                 <div class="position-relative form-group">
                                     <label for="job_description" class="">Start Time</label>
-                                    <input wire:model="start_time" type="time"  name="start_time" id="start_time"  class="form-control" required/>
+                                    <input wire:model.defer="start_time" type="time"  name="start_time" id="start_time"  class="form-control" required/>
                                     @error('start_time') <span class="text-danger">{{ $message }}</span> @enderror
 
                                 </div>
@@ -32,7 +32,7 @@
                             <div class="col-md-4">
                                 <div class="position-relative form-group">
                                     <label for="end_time" class="">End Time</label>
-                                    <input class="form-control " wire:model="end_time"  type="time"  required/>
+                                    <input class="form-control " wire:model.defer="end_time"  type="time"  required/>
                                     @error('end_time') <span class="text-danger">{{ $message }}</span> @enderror
                                
                                 </div>

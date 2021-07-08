@@ -1,9 +1,12 @@
 <?php
 
 use App\Http\Controllers\Admin\EmployeeController;
+use App\Http\Livewire\Admin\Attendance\ListAttendance;
+use App\Http\Livewire\Admin\CashAdvance\Listcashadvance;
 use App\Http\Livewire\Admin\Employee\ListEmployee;
 use App\Http\Livewire\Admin\Employees;
 use App\Http\Livewire\Admin\NewEmployee;
+use App\Http\Livewire\Admin\Payroll\ListPayroll;
 use App\Http\Livewire\Admin\Position\ListPosition;
 use App\Http\Livewire\Admin\Project\ListProject;
 use App\Http\Livewire\Admin\Schedule\ListSchedule;
@@ -36,6 +39,9 @@ Route::group(['middleware'=> 'auth'], function(){
     Route::get('list-schedule',ListSchedule::class)->name('list-schedule');
     Route::get('list-projects',ListProject::class)->name('list-projects');
     Route::get('list-services',ListService::class)->name('list-services');
+    Route::get('list-payrolls',ListPayroll::class)->name('list-payrolls');
+    Route::get('list-attendances',ListAttendance::class)->name('list-attendances');
+    Route::get('list-cashadvances',Listcashadvance::class)->name('list-cashadvances');
     
         //  Route::resource('positions', PositionController::class);
     

@@ -51,24 +51,28 @@
                         <li>
                             <a href="{{route('admin.list-employees')}}">
                                 <i class="metismenu-icon">
-                                </i>Add Employee
+                                </i>List of Employees
                             </a>
                         </li>
                         <li>
-                            <a href="elements-buttons-standard.html">
-                                <i class="metismenu-icon"></i>
-                                List of Employees
+                            <a href="{{route('admin.list-attendances')}}">
+                                <i class="metismenu-icon">
+                                </i>Attendances
                             </a>
                         </li>
                         <li>
-                            <a href="elements-icons.html">
+                            <a href="{{route('admin.list-payrolls')}}">
                                 <i class="metismenu-icon">
                                 </i>Payroll
                             </a>
                         </li>
-
                         
-                        
+                        <li>
+                            <a href="{{route('admin.list-cashadvances')}}">
+                                <i class="metismenu-icon">
+                                </i>Cash Advance
+                            </a>
+                        </li>
                     </ul>
                 </li>
 
