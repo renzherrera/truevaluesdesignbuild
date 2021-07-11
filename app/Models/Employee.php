@@ -43,4 +43,8 @@ class Employee extends Model
     public function attendances(){
         return $this->belongsTo(Attendance::class,'biometric_id','biometric_id')->orderBy('attendance_date','desc');
     }
+
+    public function cashadvances(){
+        return $this->hasMany(CashAdvance::class,'employee_id','id');
+    }
 }

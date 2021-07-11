@@ -32,15 +32,13 @@
                     </div>
                 </div>
             </div> 
-{{--         
+        
             @if ($updateMode)
-                
-            @include('livewire.admin.position.edit-position')
-            @else
-            @include('livewire.admin.position.create-position')
-    
-            @endif --}}
+            @include('livewire.admin.cash-advance.edit-cashadvance')
+            @elseif ($createMode)
             @include('livewire.admin.cash-advance.create-cashadvance')
+    
+            @endif
             
                 
             <div class="tab-content">
@@ -48,7 +46,7 @@
                     
                     <div class="main-card card ">
                         <div class="card-body">
-    
+                                
                                 <div class="col-sm-12  date-filter" style="width: 100%">
                                             
                                             <div class="form-row ">
@@ -82,40 +80,42 @@
                                     
                                     <thead>
                                         <tr>
-                                            <th width="200px">Position Title</th>
-                                            <th>Job Description</th>
-                                            <th width="150px;">Salary Rate <small>(PER DAY)</small></th>
+                                            <th>Employee Name</th>
+                                            <th>Amount</th>
+                                            <th>Date</th>
+                                            <th width="150px;">Status</th>
                                             <th class="text-center" width="150px">Action</th>
                                         </tr>
     
                                     </thead>
                                     <tbody>
-                                        {{-- @if($positions->count() < 1)
-                                            <tr><td colspan="4" class="text-center"><h4>No data found</h4></td></tr>
+                                        @if($cashadvances->count() < 1)
+                                            <tr><td colspan="100%" class="text-center"><h4>No data found</h4></td></tr>
                                         
                                         @endif
-                                        @foreach ($positions as $position)
+                                        @foreach ($cashadvances as $cashadvance)
                                         <tr>
                                            
-                                            <td>{{$position->position_title}}</td>
-                                            <td>{{$position->job_description}}</td>
-                                            <td><span>&#8369; </span>{{number_format($position->salary_rate,2)}}</td>
+                                            <td>{{ucwords($cashadvance->employees->first_name). ' ' .ucwords($cashadvance->employees->middle_name). ' ' . ucwords($cashadvance->employees->last_name)}}</td>
+                                            <td><span>&#8369; </span>{{number_format($cashadvance->cash_amount,2)}}</td>
+                                            <td>{{ Carbon\Carbon::parse($cashadvance->requested_date)->format('F d, Y') }}</td>
+                                            <td>{{$cashadvance->status}}</td>
                                             <td class="text-center"><div class="dropdown">
                                                 <button type="button" aria-haspopup="true" aria-expanded="false" data-toggle="dropdown" class="dropdown-toggle btn btn-outline-link"></button>
                                                 <div tabindex="-1" role="menu" aria-hidden="true" class="dropdown-menu" x-placement="bottom-start" style="z-index: 999999;position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(0px, 33px, 0px);">
                                                     <h6 tabindex="-1" class="dropdown-header">Actions</h6>
-                                                        <button wire:click="edit({{$position->id}})" tabindex="0" class="dropdown-item">Edit</button>
-                                                    <button wire:click.prevent="$emit('deletePosition',{{$position}})" class="dropdown-item" type="button"> Delete</button>
+                                                        <button wire:click="edit({{$cashadvance->id}})" tabindex="0" class="dropdown-item">Edit</button>
+                                                    <button wire:click.prevent="$emit('deleteCashadvance',{{$cashadvance}})" class="dropdown-item" type="button"> Delete</button>
                                                 </div>
                                             </div></td>
                                         </tr>    
-                                        @endforeach --}}
+                                        @endforeach
                                         
                                     </tbody>
                                 </table>
                             </div>
                                   <div class="card-footer justify-content-center">
-                                    {{-- {{$positions->links('pagination')}} --}}
+                                    {{$cashadvances->links('pagination')}}
     
                                   </div>
                                 </div>
@@ -136,7 +136,7 @@
             
         <script>
             document.addEventListener('livewire:load', function () {
-                @this.on('deletePosition', id => {
+                @this.on('deleteCashadvance', id => {
                     Swal.fire({
                     title: 'Are you sure?',
                     text: "You won't be able to revert this!",
@@ -150,11 +150,7 @@
                         if (result.value) {
                             // calling destroy method to delete
                             @this.call('destroy',id)
-                            Swal.fire(
-                                'Deleted!',
-                                'Data has been deleted.',
-                                'success'
-                            )
+                            
                         } else if (result.dismiss === Swal.DismissReason.cancel) {
                             Swal.fire(
                                 'Cancelled',

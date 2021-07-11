@@ -67,13 +67,7 @@ class ListProject extends Component
         }
 
 
-        // foreach($service_types as $key){
-        //     ProjectService::create([
-        //         'project_id' => $project->id,
-        //         'service_id' => $key,
-        //     ]);
 
-        // }
         
         $this->resetInputFields();
 
@@ -85,7 +79,6 @@ class ListProject extends Component
         ]);
 
        
-    //   return redirect()->route('admin.positions.create');  
 
     }
 
@@ -127,7 +120,6 @@ class ListProject extends Component
         $this->selected_id = $id;
         $this->project_name = $projects->project_name;
         $this->project_owner = $projects->project_owner;
-        // $this->project_type= $projects->project_type;
         $this->project_status= $projects->project_status;
         $this->project_started=$projects->project_started;
         $this->project_ended=$projects->project_ended;

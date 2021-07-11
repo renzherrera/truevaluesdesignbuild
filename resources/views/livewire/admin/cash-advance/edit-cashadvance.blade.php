@@ -3,9 +3,10 @@
     <div class="tab-content">
         <div class="tab-pane tabs-animation fade show active" id="tab-content-0" role="tabpanel">
             <div class="main-card mb-3 card">
-                <div class="card-body"><h5 class="card-title">Request for Cash Advance</h5>
+                <div class="card-body"><h5 class="card-title">Edit Selected Cash-advance Record</h5>
 
                         <div class="form-row">
+                            <input type="text" wire:model.defer="selected_id" id="" hidden>
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="employee_id" class="">Employee</label>
@@ -15,7 +16,7 @@
                                           <option value="{{$employee->id}}">{{ucwords($employee->first_name) .' ' . ucwords($employee->middle_name).' ' . ucwords($employee->last_name)}}</option>    
                                         @endforeach
                                     </select>
-                                    @error('employee_id') <span class="text-danger">Employee field is required, please choose one Employee.</span> @enderror
+                                    @error('employee_id') <span class="text-danger">Employee field is required, please choose one employee.</span> @enderror
                                 </div>
                             </div>
                              
@@ -38,8 +39,10 @@
                             </div> 
                             
                         </div>
-                         <button wire:click.prevent="store()" class=" btn btn-warning px-5 py-2  float-right">Request for Cash Advance</button>
-
+                        <div wire:loading.remove wire:target="store">
+                         <button wire:click.prevent="update()" class=" btn btn-info px-5 py-2  float-right">Save changes</button>
+                         <button wire:click.prevent="createMode()" class=" btn btn-secondary px-5 py-2 mr-3 float-right">Back</button>
+                        </div>
                 </div>
             </div>
 

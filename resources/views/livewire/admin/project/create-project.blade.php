@@ -97,7 +97,6 @@
                                     <label for="project_description" class="">Project Description</label>
                                     <textarea wire:model.defer="project_description"  name="project_description" id="project_description"  class="form-control" > </textarea>
                                     @error('project_description') <span class="text-danger">{{ $message }}</span> @enderror
-
                                 </div>
                             </div> 
                         </div>

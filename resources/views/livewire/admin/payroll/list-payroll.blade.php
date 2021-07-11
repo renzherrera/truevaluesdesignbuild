@@ -15,7 +15,6 @@
         }
       </style>
     </head>
-    
        
         <div class="app-main__inner">
             <div class="app-page-title">
@@ -32,26 +31,20 @@
                     </div>
                 </div>
             </div>           
+            @if (!$summaryMode)
         
-            @if ($updateMode)
-                
-            @include('livewire.admin.payroll.edit-payroll')
+                @if ($updateMode)
+                @include('livewire.admin.payroll.edit-payroll')
+                @else
+                @include('livewire.admin.payroll.create-payroll')
+                @endif
 
-            @else
-            @include('livewire.admin.payroll.create-payroll')
-
-    
-            @endif
-            
-
-                
             <div class="tab-content">
                 <div class="tab-pane tabs-animation fade show active" id="tab-content-0" role="tabpanel">
                     
                     <div class="main-card card ">
                         <div class="card-body">
     
-                                        {{-- {{ $dataTable->table() }} --}}
                                 <div class="col-sm-12  date-filter" style="width: 100%">
                                             
                                             <div class="form-row ">
@@ -81,14 +74,15 @@
                                             </div>
                                             <div class=" table-responsive " style="height: 325px;">
                                                 
-                                   <table  class="table table-striped table-bordered" id="position-table" >
+                                   <table  class="table table-striped table-bordered table-hover" id="position-table" >
                                     
                                     <thead>
                                         <tr>
                                             <th width="200px">ID</th>
+                                            <th>Payroll Description</th>
+
                                             <th>From <small>(Date)</small></th>
                                             <th>To <small>(Date)</small></th>
-                                            <th>Payroll Description</th>
                                             <th>Status</th>
                                             <th class="text-center" width="150px">Action</th>
                                         </tr>
@@ -100,7 +94,7 @@
                                         
                                         @endif
                                         @foreach ($payrolls as $payroll)
-                                        <tr>
+                                        <tr wire:click="payrollSummary({{$payroll->id}})" style="cursor: pointer"  >
                                             <td>{{$payroll->id}}</td>
                                             <td>{{$payroll->payroll_description}}</td>
                                             <td>{{$payroll->payroll_from_date}}</td>
@@ -139,6 +133,11 @@
                 </div>
                 
             </div>
+            @else
+            @include('livewire.admin.payroll.summary-payroll')
+
+            @endif
+            
         </div>
             
         <script>

@@ -11,6 +11,11 @@ class CashAdvance extends Model
     protected $fillable = [
         'employee_id',
         'cash_amount',
-        'is_paid',
+        'status',
+        'requested_date',
     ];
+
+    public function employees() {
+        return $this->belongsTo(Employee::class,'employee_id','id');
+    }
 }

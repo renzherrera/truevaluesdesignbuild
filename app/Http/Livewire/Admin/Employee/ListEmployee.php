@@ -52,6 +52,7 @@ class ListEmployee extends Component
         ->orWhere('middle_name', 'LIKE', "%{$searchTerm}%")
         ->orWhere('last_name', 'LIKE', "%{$searchTerm}%")
           ->paginate(5);
+
         return view('livewire.admin.employee.list-employee',compact('positions','projects','schedules','employees'))->layout('layouts.master');
     }
 

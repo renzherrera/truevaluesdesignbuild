@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateCashAdvancesTable extends Migration
+class CreateHolidaysTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,12 +13,12 @@ class CreateCashAdvancesTable extends Migration
      */
     public function up()
     {
-        Schema::create('cash_advances', function (Blueprint $table) {
+        Schema::create('holidays', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('employee_id')->constrained();
-            $table->decimal('cash_amount',12,2);
-            $table->string('status');
-            $table->date('requested_date');
+            $table->date('date');
+            $table->decimal('rate');
+            $table->decimal('ot_rate');
+            $table->string('holiday_name');
             $table->timestamps();
         });
     }
@@ -30,6 +30,6 @@ class CreateCashAdvancesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('cash_advances');
+        Schema::dropIfExists('holidays');
     }
 }

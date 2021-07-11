@@ -69,8 +69,6 @@ class ListAttendance extends Component
     }
 
     $this->resetInputFields();
-       
-    //   return redirect()->route('admin.positions.create');  
 
     }
     

@@ -25,7 +25,6 @@
                                     <label for="job_description" class="">Service Description</label>
                                     <textarea wire:model.defer="service_description" style="  height:  40px;" name="service_description" id="service_description"  class="form-control" required></textarea>
                                     @error('job_description') <span class="text-danger">{{ $message }}</span> @enderror
-
                                 </div>
                             </div> 
                             
