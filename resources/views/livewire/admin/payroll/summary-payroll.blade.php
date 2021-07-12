@@ -18,6 +18,8 @@
     
         <div class="card no-shadow bg-transparent no-border rm-borders mb-3">
             <div class="card">
+           
+                
                 <div class="no-gutters row">
                     <div class="col-md-12 col-lg-4">
                         <ul class="list-group list-group-flush">
@@ -34,7 +36,7 @@
                                                 <div class="widget-subheading">{{$payrollFrom . ' - ' . $payrollTo}}</div>
                                             </div>
                                             <div class="widget-content-right">
-                                                <div class="widget-numbers text-success">{{$payroll_status}}</div>
+                                                <div class="widget-numbers text-success">{{ucwords($payroll_status)}}</div>
                                             </div>
                                         </div>
                                     </div>
@@ -46,12 +48,11 @@
                                         <div class="widget-content-wrapper">
                                             <div class="widget-content-left">
                                                 <div class="widget-subheading">Created By</div>
-                                                <div class="widget-heading">Criezel Laxa <small>Admin</small></div> 
-                                                <div class="widget-subheading">December 20, 2021</div>
+                                                <div class="widget-heading">{{$prepared_by}} <small>{{ucwords($prepared_role)}}</small></div> 
 
                                             </div>
                                             <div class="widget-content-right">
-                                                <div class="widget-numbers text-primary">{{$payrollSummaries->count()}}</div>
+                                                <div class="widget-numbers text-primary"></div>
                                             </div>
                                         </div>
                                     </div>
@@ -82,11 +83,10 @@
                                         <div class="widget-content-wrapper">
                                             <div class="widget-content-left">
                                                 <div class="widget-subheading">Approved By</div>
-                                                <div class="widget-heading">Harold Reyes  <small>Super Admin</small></div> 
-                                                <div class="widget-subheading">December 20, 2021</div>
+                                                <div class="widget-heading">{{$approved_by}}  <small>{{ucwords($approved_role)}}</small></div> 
                                             </div>
                                             <div class="widget-content-right">
-                                                <div class="widget-numbers text-primary">{{$payrollSummaries->count()}}</div>
+                                                <div class="widget-numbers text-primary"></div>
                                             </div>
                                         </div>
                                     </div>
@@ -106,7 +106,7 @@
                                             </div>
                                             <div class="widget-content-right">
                                                 @php
-                                                    $total_gross = $payrollSummaries->sum('all_salaries');
+                                                    $total_gross = $payrollSummaries->sum('total_salarypay_with_tax') + $payrollSummaries->sum('total_overtimepay_with_tax');
                                                     $cash_advance = $cash_adv->sum('cash_amount');
                                                     $grand_total = $total_gross - $cash_advance;   
                                                     if($grand_total < 0){
@@ -128,7 +128,7 @@
                                                 <div class="widget-subheading">Total Holiday Counts</div>
                                             </div>
                                             <div class="widget-content-right">
-                                                <div class="widget-numbers text-primary">$12.6k</div>
+                                                <div class="widget-numbers text-primary">{{$holidays}}</div>
                                             </div>
                                         </div>
                                     </div>
@@ -151,7 +151,6 @@
                                             
                                             <div class="form-row ">
                                                 <div class="col-md-4 ">
-                                                <h4 class="card-title">Summary</h4>
                                                 
                                                 </div>
                                                 <div class="col-md-12 float-right">
@@ -209,7 +208,7 @@
                                                 $totalRegularHours = $payrollSummary->total_regular_hours;
                                                 $totalOvertime = $payrollSummary->total_overtime_hours;
                                                 $totalHours =  $totalRegularHours + $totalOvertime;
-                                                $payGross = $totalHours * $perHour;
+                                                $payGross = $payrollSummary->total_salarypay_with_tax + $payrollSummary->total_overtimepay_with_tax;
                                                 $cashAdvance = $payrollSummary->cashadvances
                                                                               ->where('requested_date','>=',$payroll_from_date)
                                                                               ->where('requested_date','<=', $payroll_to_date)
@@ -259,6 +258,13 @@
         
                 </div>
                 
+                <div class="float-right mt-3">
+                    <button wire:click.prevent="listMode()" class=" btn btn-warning px-5 py-2 ">Go Back</button>
+                    @if ($approved_by)
+                    <button wire:click.prevent="bulkPayslipPDF()" class=" btn btn-primary px-5 py-2 ml-2 ">Generate Payslip</button>
+                        
+                    @endif
+                </div>
             </div>
             {{-- @endif --}}
             

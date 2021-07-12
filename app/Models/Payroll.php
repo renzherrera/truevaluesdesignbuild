@@ -14,5 +14,11 @@ class Payroll extends Model
         'payroll_to_date',
         'payroll_description',
         'payroll_status',
+        'prepared_by',
+        'approved_by',
     ];
+
+    public function user() {
+        return $this->belongsTo(User::class);
+    }
 }

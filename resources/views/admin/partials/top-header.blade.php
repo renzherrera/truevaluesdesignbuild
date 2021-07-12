@@ -57,7 +57,8 @@
                                         {{auth()->user()->email}}
                                     </div>
                                     <div class="widget-subheading">
-                                        Assistant
+                                        {{ucwords(auth()->user()->role)}}
+
                                     </div>
                                 </div>
                                 <div class="widget-content-right header-user-info ml-3">
