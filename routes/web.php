@@ -5,6 +5,7 @@ use App\Http\Livewire\Admin\Attendance\ListAttendance;
 use App\Http\Livewire\Admin\CashAdvance\Listcashadvance;
 use App\Http\Livewire\Admin\Employee\ListEmployee;
 use App\Http\Livewire\Admin\Employees;
+use App\Http\Livewire\Admin\Holiday\ListHoliday;
 use App\Http\Livewire\Admin\NewEmployee;
 use App\Http\Livewire\Admin\Payroll\ListPayroll;
 use App\Http\Livewire\Admin\Position\ListPosition;
@@ -42,6 +43,7 @@ Route::group(['middleware'=> 'auth'], function(){
     Route::get('list-payrolls',ListPayroll::class)->name('list-payrolls');
     Route::get('list-attendances',ListAttendance::class)->name('list-attendances');
     Route::get('list-cashadvances',Listcashadvance::class)->name('list-cashadvances');
+    Route::get('list-holidays',ListHoliday::class)->name('list-holidays');
     
         //  Route::resource('positions', PositionController::class);
     

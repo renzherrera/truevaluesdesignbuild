@@ -83,7 +83,7 @@
                                             <th>Employee Name</th>
                                             <th>Amount</th>
                                             <th>Date</th>
-                                            <th width="150px;">Status</th>
+                                            <th width="150px;" class="text-center">Status</th>
                                             <th class="text-center" width="150px">Action</th>
                                         </tr>
     
@@ -99,15 +99,34 @@
                                             <td>{{ucwords($cashadvance->employees->first_name). ' ' .ucwords($cashadvance->employees->middle_name). ' ' . ucwords($cashadvance->employees->last_name)}}</td>
                                             <td><span>&#8369; </span>{{number_format($cashadvance->cash_amount,2)}}</td>
                                             <td>{{ Carbon\Carbon::parse($cashadvance->requested_date)->format('F d, Y') }}</td>
-                                            <td>{{$cashadvance->status}}</td>
-                                            <td class="text-center"><div class="dropdown">
-                                                <button type="button" aria-haspopup="true" aria-expanded="false" data-toggle="dropdown" class="dropdown-toggle btn btn-outline-link"></button>
-                                                <div tabindex="-1" role="menu" aria-hidden="true" class="dropdown-menu" x-placement="bottom-start" style="z-index: 999999;position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(0px, 33px, 0px);">
-                                                    <h6 tabindex="-1" class="dropdown-header">Actions</h6>
-                                                        <button wire:click="edit({{$cashadvance->id}})" tabindex="0" class="dropdown-item">Edit</button>
-                                                    <button wire:click.prevent="$emit('deleteCashadvance',{{$cashadvance}})" class="dropdown-item" type="button"> Delete</button>
-                                                </div>
-                                            </div></td>
+                                            <td class="text-center">
+                                            @if ($cashadvance->status == "pending")
+                                               <div class="mb-2 mr-2 badge  badge-pill badge-secondary">{{ucwords($cashadvance->status)}}</div>
+                                            @elseif ($cashadvance->status == "approved")
+                                              <div class="mb-2 mr-2 badge  badge-pill badge-primary">{{ucwords($cashadvance->status)}}</div>
+                                            @elseif($cashadvance->status == "paid")
+                                              <div class="mb-2 mr-2 badge  badge-pill badge-success">{{ucwords($cashadvance->status)}}</div>
+                                            @endif
+                                             </td>
+                                            <td class="text-center">
+                                                    <button type="button" aria-haspopup="true" aria-expanded="false" data-toggle="dropdown" class="dropdown-toggle btn btn-outline-link"></button>
+    
+                                                    <div tabindex="-1" role="menu" aria-hidden="true" class="dropdown-menu-hover-link dropdown-menu" style="">
+                                                        <h6 tabindex="-1" class="dropdown-header">Actions</h6>
+                                                        @if (!$cashadvance->approved_by && Auth::user()->role == "superadmin" && $cashadvance->status == "pending")
+                                                        <button type="button" tabindex="0" class="dropdown-item bg-success text-white" wire:click="$emit('approvedCashAdvance',{{$cashadvance->id}})">
+                                                            <i class=" pe-7s-like2 text-white"> </i><span class="ml-3">Approved</span>
+                                                        </button>
+                                                        @endif
+                                                    
+                                                        <button type="button" tabindex="0" class="dropdown-item" wire:click="edit({{$cashadvance->id}})" >
+                                                            <i class=" pe-7s-settings"></i><span class="ml-3">Edit</span>
+                                                        </button>
+                                                        <button type="button" tabindex="0" class="dropdown-item" wire:click.prevent="$emit('deleteCashadvance',{{$cashadvance}})" >
+                                                            <i class=" pe-7s-trash"> </i><span  class="ml-3" >Delete</span>
+                                                        </button>
+                                                    </div>
+                                                </td>
                                         </tr>    
                                         @endforeach
                                         
@@ -160,7 +179,34 @@
                         }
                     });
                 })
-            })
+
+                @this.on('approvedCashAdvance', id => {
+                    Swal.fire({
+                    title: 'Approve this cash advance?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Approve',
+                    cancelButtonText: 'Cancel',
+                    reverseButtons: true
+                    }).then((result) => {
+                        //if user clicks on delete
+                        if (result.value) {
+                            // calling destroy method to delete
+                            @this.call('approved',id)
+                           
+                        } else if (result.dismiss === Swal.DismissReason.cancel) {
+                            Swal.fire(
+                                'Cancelled',
+                                'Approving cash advance cancelled :)',
+                                'error'
+                            )
+                        }
+                    });
+                })
+
+
+
+            }) //end of js event listener
         </script>
         
     </div>

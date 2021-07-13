@@ -20,7 +20,7 @@
                                 width: 130px;  z-index: 0;" src=" {{  $image->temporaryUrl()}}" alt="">
                            
                                 @endif
-                                <div class="text-center" wire:loading>Uploading...</div>
+                                <div class="text-center" wire:loading wire:target="image">Uploading...</div>
 
                              </div>
                         </div>

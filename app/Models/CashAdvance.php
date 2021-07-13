@@ -13,6 +13,7 @@ class CashAdvance extends Model
         'cash_amount',
         'status',
         'requested_date',
+        'approved_by',
     ];
 
     public function employees() {

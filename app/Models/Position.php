@@ -13,6 +13,7 @@ class Position extends Model
         'position_title',
         'job_description',
         'salary_rate',
+        'has_holiday',
     ];
 
 }

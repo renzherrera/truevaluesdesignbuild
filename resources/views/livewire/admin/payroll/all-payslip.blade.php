@@ -60,8 +60,8 @@
             font-size: 15px;
         }
         hr{
-            margin-top: 8%;
-            margin-bottom: 8%;
+            margin-top: 9%;
+            margin-bottom: 9%;
         }
 </style>
 
@@ -100,15 +100,13 @@
                     <strong>Position: </strong>{{$payrollSummary->position_title}}
                 </h6>
                 <h6 style="text-align: left" class="mb-4" >
-                    <strong>Total Working Hours: </strong> {{$totalHours}}
-
+                    <strong>Work Designated: </strong> {{$payrollSummary->project->project_name}}
                 </h6> 
                 
             </div>
             <div  style="width:50%; float: right; text-align: right;">
                 <h6 style="text-align: right" class="mb-2" >
-                    <strong>Work Designated: </strong> {{$payrollSummary->project->project_name}}
-
+                    <strong>Total Working Hours: </strong> {{$totalHours}}
 
                 </h6> 
                 <h6 style="text-align: right" class="mb-2" >
@@ -126,7 +124,7 @@
 
     
    
-        <table  class="table table-striped " style="margin-top: 10px;">
+        <table  class="table " style="margin-top: 10px;">
             <thead>
                 <tr>
                     <th style="width: 100%;">EARNINGS</th>
@@ -150,7 +148,7 @@
                     <td>&#8369; {{number_format($payrollSummary->salary_rate/8,2)}}</td>
                     <td>&#8369; {{number_format($payrollSummary->total_overtime_pay,2)}}</td>
                 </tr>
-                @if ($holidays)
+                @if ($holidays > 0 && $payrollSummary->position->has_holiday)
                 <tr>
                     <td>Holiday Pay</td>
                     <td></td>
@@ -205,6 +203,7 @@
 
         @endforeach
 
+        
 
     
 </body>

@@ -1,7 +1,7 @@
 <div class="app-header header-shadow">
             <div class="app-header__logo ">
-                <div><h4 class="pr-5 pl-5"><strong>truevalues.</strong></h4></div>
-                <div class="header__pane">
+                <div class="mr-3" > <img class="logo" src="{{asset('storage/images/TV.png')}}" width="100%" alt=""></div>
+                <div class="header__pane ">
                     <div>
                         <button type="button" class="hamburger close-sidebar-btn hamburger--elastic" data-class="closed-sidebar">
                             <span class="hamburger-box">
@@ -54,18 +54,14 @@
                                 </div>
                                 <div class="widget-content-left  ml-3 header-user-info">
                                     <div class="widget-heading">
-                                        {{auth()->user()->email}}
+                                        {{auth()->user()->name}}
                                     </div>
                                     <div class="widget-subheading">
                                         {{ucwords(auth()->user()->role)}}
 
                                     </div>
                                 </div>
-                                <div class="widget-content-right header-user-info ml-3">
-                                    <button type="button" class="btn-shadow p-1 btn btn-primary btn-sm show-toastr-example">
-                                        <i class="fa text-white fa-calendar pr-1 pl-1"></i>
-                                    </button>
-                                </div>
+                                
                             </div>
                         </div>
                     </div>        </div>

@@ -88,7 +88,7 @@
                         
                         <li>
                             <a href="{{route('admin.list-position')}}">
-                                <i class="metismenu-icon">
+                                <i class="metismenu-icon ">
                                 </i>Positions
 
                             </a>
@@ -96,7 +96,7 @@
                         </li>
                         <li>
                             <a href="{{route('admin.list-schedule')}}">
-                                <i class="metismenu-icon"></i>
+                                {{-- <i class="pe-7s-users"></i> --}}
                                 Schedule
                             </a>
                         </li>
@@ -114,8 +114,13 @@
                             </i>Services
 
                         </a>
-                        
-                    </li>
+                       </li>
+                       <li>
+                        <a href="{{route('admin.list-holidays')}}">
+                        <i class="metismenu-icon">
+                        </i>Holidays
+                    </a>
+                   </li>
                     </ul>
                 </li>
                 {{-- <li>

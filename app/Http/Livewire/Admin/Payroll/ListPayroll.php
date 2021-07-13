@@ -46,6 +46,8 @@ class ListPayroll extends Component
         TIMESTAMPDIFF(HOUR, CONCAT(attendances.attendance_date," ",attendances.first_onDuty),
         IFNULL(CONCAT(attendances.attendance_date," ",attendances.first_offDuty),CONCAT(attendances.attendance_date," ","12:00:00")  )  ) END
         ';
+
+        //Overtime time in / total working hours in the day(time in - timeout) if time_out is null then overtime is voided or = 0 ot hours in the day
         $overtime_in = 'TIMESTAMPDIFF(HOUR, CONCAT(attendances.attendance_date," ",attendances.second_onDuty),
         IFNULL(CONCAT(attendances.attendance_date," ",attendances.second_offDuty),CONCAT(attendances.attendance_date," ",second_offDuty)   )  )';
         $regular_salary_holiday = '(positions.salary_rate *
@@ -207,6 +209,7 @@ class ListPayroll extends Component
             'payroll_description' => $this->payroll_description,
         ]);
         $this->updateMode = false;
+        $this->createMode = true;
 
 
         $this->emit('swal:modal', [
@@ -314,4 +317,32 @@ class ListPayroll extends Component
     }
 
 
+    public function approved($id) {
+
+        
+        // $this->validate([
+        //     'payroll_from_date' => 'required|date',
+        //     'payroll_to_date' => 'required|date',      
+        //     'payroll_description' => 'required',
+           
+        // ]); 
+        
+        $payroll = Payroll::find($id);
+        if(!$payroll->approved_by && Auth::user()->role == "superadmin"){
+
+        $payroll->update([
+            'approved_by' => Auth::user()->id,
+            'payroll_status' => "approved",
+        ]);
+
+
+        $this->emit('swal:modal', [
+            'icon'  => 'success',
+            'title' => 'Success!!',
+            'text'  => "Payroll with title: {$payroll->payroll_description} successfully approved!",
+        ]);
+        $this->resetInputFields();
+        }
+
+    }
 }

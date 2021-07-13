@@ -210,9 +210,9 @@
                                                 $totalHours =  $totalRegularHours + $totalOvertime;
                                                 $payGross = $payrollSummary->total_salarypay_with_tax + $payrollSummary->total_overtimepay_with_tax;
                                                 $cashAdvance = $payrollSummary->cashadvances
-                                                                              ->where('requested_date','>=',$payroll_from_date)
-                                                                              ->where('requested_date','<=', $payroll_to_date)
                                                                               ->where('status','!=','paid')
+                                                                              ->where('status','!=','pending')
+                                                                              ->where('status','==','approved')
                                                                               ->sum('cash_amount');
                                                 $totalPay = $payGross - $cashAdvance;
                                                 $this->total_pay = $totalPay;

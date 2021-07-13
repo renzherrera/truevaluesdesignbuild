@@ -24,19 +24,18 @@
                             <i class="pe-7s-paper-plane text-success">
                             </i>
                         </div>
-                        <div>Payrolls
+                        <div>Holidays
                             <div class="page-title-subheading">Lorem ipsum dolor sit amet consectetur adipisicing elit. Unde labore eaque blanditiis officia quia nulla..
                             </div>
                         </div>
                     </div>
                 </div>
             </div>           
-            @if (!$summaryMode)
         
                 @if ($updateMode)
-                @include('livewire.admin.payroll.edit-payroll')
+                @include('livewire.admin.holiday.edit-holiday')
                 @else
-                @include('livewire.admin.payroll.create-payroll')
+                @include('livewire.admin.holiday.create-holiday')
                 @endif
 
             <div class="tab-content">
@@ -49,7 +48,7 @@
                                             
                                             <div class="form-row ">
                                                 <div class="col-md-4 ">
-                                                <h4 class="card-title">List of Payrolls</h4>
+                                                <h4 class="card-title">List of Holidays</h4>
                                                 
                                                 </div>
                                                 <div class="col-md-12 float-right">
@@ -61,14 +60,14 @@
                                                           
                                                         </div>
                                                     </div> --}}
-                                                    <div class="search-wrapper active float-right">
+                                                    {{-- <div class="search-wrapper active float-right">
                                                         <div class="input-holder ">
     
                                                             <input type="text" class="search-input " wire:model="searchTerm" placeholder="Type to search">
     
                                                             <button class="search-icon"><span></span></button>
                                                         </div>
-                                                    </div>
+                                                    </div> --}}
                                                    
                                                 </div>
                                             </div>
@@ -79,53 +78,39 @@
                                     <thead>
                                         <tr>
                                             <th width="200px">ID</th>
-                                            <th>Payroll Description</th>
-
-                                            <th>From <small>(Date)</small></th>
-                                            <th>To <small>(Date)</small></th>
-                                            <th>Status</th>
+                                            <th>Holiday Name</th>
+                                            <th>Rate</th>
+                                            <th>Overtime Rate</th>
+                                            <th>Date</th>
                                             <th class="text-center" width="150px">Action</th>
                                         </tr>
     
                                     </thead>
                                     <tbody>
-                                        @if($payrolls->count() < 1)
-                                            <tr><td colspan="6" class="text-center"><h4>No payroll data found</h4></td></tr>
+                                        @if($holidays->count() < 1)
+                                            <tr><td colspan="6" class="text-center"><h4>No holidays data found</h4></td></tr>
                                         
                                         @endif
-                                        @foreach ($payrolls as $payroll)
+                                        @foreach ($holidays as $holiday)
                                         <tr>
-                                            <td>{{$payroll->id}}</td>
-                                            <td>{{$payroll->payroll_description}}</td>
-                                            <td>{{Carbon\Carbon::parse($payroll->payroll_from_date)->format('F d, Y')}}</td>
-                                            <td>{{Carbon\Carbon::parse($payroll->payroll_to_date)->format('F d, Y')}}</td>
-                                            <td>{{ucwords($payroll->payroll_status)}}</td>
+                                            <td>{{$holiday->id}}</td>
+                                            <td>{{$holiday->holiday_name}}</td>
+                                            <td>{{$holiday->rate}}</td>
+                                            <td>{{$holiday->ot_rate}}</td>
+                                            <td>{{Carbon\Carbon::parse($holiday->date)->format('F d, Y')}}</td>
                                             <td class="text-center d-flex flex-center justify-content-center">
                                                 
-                                               
-
-
                                             <div class="dropdown d-inline-block">
                                                 <button type="button" aria-haspopup="true" aria-expanded="false" data-toggle="dropdown" class="dropdown-toggle btn btn-outline-link"></button>
 
                                                 </button>
                                                 <div tabindex="-1" role="menu" aria-hidden="true" class="dropdown-menu-hover-link dropdown-menu" style="">
                                                     <h6 tabindex="-1" class="dropdown-header">Actions</h6>
-                                                    @if (!$payroll->approved_by && Auth::user()->role == "superadmin" && $payroll->payroll_status == "pending")
-                                                    <button type="button" tabindex="0" class="dropdown-item bg-success text-white" wire:click="$emit('approvedPayroll',{{$payroll->id}})">
-                                                        <i class=" pe-7s-like2 text-white"> </i><span class="ml-3">Approved</span>
-                                                    </button>
-                                                    @endif
-                                                    <button type="button" tabindex="0" class="dropdown-item" wire:click="payrollSummary({{$payroll->id}})">
-                                                        <i class=" pe-7s-look"> </i><span  class="ml-3">View</span>
-                                                    </button>
-                                                    <button type="button" tabindex="0" class="dropdown-item" wire:click="payrollSummary({{$payroll->id}})">
-                                                        <i class="pe-7s-print"> </i><span  class="ml-3">Generate Payslips</span>
-                                                    </button>
-                                                    <button type="button" tabindex="0" class="dropdown-item" wire:click="edit({{$payroll->id}})">
+                                                   
+                                                    <button type="button" tabindex="0" class="dropdown-item" wire:click="edit({{$holiday->id}})">
                                                         <i class=" pe-7s-settings"></i><span class="ml-3">Edit</span>
                                                     </button>
-                                                    <button type="button" tabindex="0" class="dropdown-item" wire:click.prevent="$emit('deletePayroll',{{$payroll}})">
+                                                    <button type="button" tabindex="0" class="dropdown-item" wire:click.prevent="$emit('deleteHoliday',{{$holiday}})">
                                                         <i class=" pe-7s-trash"> </i><span  class="ml-3" >Delete</span>
                                                     </button>
                                                 </div>
@@ -141,7 +126,7 @@
                                 </table>
                             </div>
                                   <div class="card-footer justify-content-center">
-                                    {{$payrolls->links('pagination')}}
+                                    {{$holidays->links('pagination')}}
     
                                   </div>
                                 </div>
@@ -158,22 +143,18 @@
                 </div>
                 
             </div>
-            @else
-            @include('livewire.admin.payroll.summary-payroll')
 
-            @endif
             
         </div>
             
         <script>
             document.addEventListener('livewire:load', function () {
-                @this.on('deletePayroll', id => {
+                @this.on('deleteHoliday', id => {
                     Swal.fire({
-                    title: 'Are you sure?',
-                    text: "You won't be able to revert this!",
+                    title: 'Continue on saving this holiday?',
                     icon: 'warning',
                     showCancelButton: true,
-                    confirmButtonText: 'Confirm',
+                    confirmButtonText: 'Continue',
                     cancelButtonText: 'Cancel',
                     reverseButtons: true
                     }).then((result) => {
@@ -185,39 +166,12 @@
                         } else if (result.dismiss === Swal.DismissReason.cancel) {
                             Swal.fire(
                                 'Cancelled',
-                                'Deleting data cancelled :)',
+                                'Deleting holiday cancelled :)',
                                 'error'
                             )
                         }
                     });
                 })
-
-                @this.on('approvedPayroll', id => {
-                    Swal.fire({
-                    title: 'Approve this Payroll?',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonText: 'Approve',
-                    cancelButtonText: 'Cancel',
-                    reverseButtons: true
-                    }).then((result) => {
-                        //if user clicks on delete
-                        if (result.value) {
-                            // calling destroy method to delete
-                            @this.call('approved',id)
-                           
-                        } else if (result.dismiss === Swal.DismissReason.cancel) {
-                            Swal.fire(
-                                'Cancelled',
-                                'Approving Payroll cancelled :)',
-                                'error'
-                            )
-                        }
-                    });
-                })
-
-
-
 
 
             })

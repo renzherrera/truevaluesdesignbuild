@@ -11,7 +11,7 @@ use PDF;
 class ListPosition extends Component
 {
     use WithPagination;
-    public $searchTerm, $updateMode = false, $position_title, $job_description,$salary_rate, $selected_id;
+    public $searchTerm, $updateMode = false, $position_title, $job_description,$salary_rate, $selected_id, $has_holiday;
     public function render()
     {
         $searchTerm='%'.$this->searchTerm . '%';
@@ -55,11 +55,13 @@ class ListPosition extends Component
             'position_title' => 'required',
             'salary_rate' => 'required',
             'job_description' => 'required',
+            'has_holiday' => 'required',
         ]); 
         Position::create([
             'position_title' => $this->position_title,
             'job_description' => $this->job_description,
             'salary_rate' => $this->salary_rate,
+            'has_holiday' => $this->has_holiday,
 
         ]);
 
@@ -81,13 +83,15 @@ class ListPosition extends Component
             'position_title' => 'required',
             'salary_rate' => 'required',
             'job_description' => 'required',
+            'has_holiday' => 'required',
         ]); 
     if ($this->selected_id) {
         $position = Position::find($this->selected_id);
         $position->update([
             'position_title' => $this->position_title,
             'job_description' => $this->job_description,
-            'salary_rate' => $this->salary_rate
+            'salary_rate' => $this->salary_rate,
+            'has_holiday' => $this->has_holiday,
         ]);
         $this->updateMode = false;
 
@@ -106,6 +110,7 @@ class ListPosition extends Component
         $this->selected_id = '';
         $this->job_description = '';
         $this->salary_rate = '0.0';
+        $this->has_holiday = null;
     }
 
 

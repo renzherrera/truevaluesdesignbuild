@@ -117,13 +117,21 @@
                                             $timeIn = \Carbon\Carbon::parse($attendance->first_onDuty);
                                             $timeOut = \Carbon\Carbon::parse($attendance->first_offDuty);
                                             $diffInHours = round($timeOut->diffInMinutes($timeIn) / 60); 
+                                            if($diffInHours >4){
+                                            $diffInHours = round($timeOut->diffInMinutes($timeIn) / 60) - 1; 
+
+                                            }
                                             if (!$attendance->first_offDuty) {
                                                 $diffInHours= 4;
                                             }
 
                                             $ottimeIn = \Carbon\Carbon::parse($attendance->second_onDuty);
                                             $ottimeOut = \Carbon\Carbon::parse($attendance->second_offDuty);
-                                            $otdiffInHours = round($ottimeOut->diffInMinutes($ottimeIn) / 60); 
+                                            $otdiffInHours = round($ottimeOut->diffInMinutes($ottimeIn) / 60) ; 
+                                            if($otdiffInHours >4){
+                                            $otdiffInHours = round($ottimeOut->diffInMinutes($ottimeIn) / 60) - 1; 
+
+                                            }
                                             if (!$attendance->second_offDuty) {
                                                 $otdiffInHours= 0;
                                             }

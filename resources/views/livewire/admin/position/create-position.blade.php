@@ -28,16 +28,16 @@
                                 <div class="col-md-2">
                                     <div class="form-group">
                                         <label for="position_title" class="">Position Title</label>
-                                        <input name="position_title" id="position_title" wire:model="position_title"  type="text" class="form-control" required>
+                                        <input name="position_title" id="position_title" wire:model.defer="position_title"  type="text" class="form-control" required>
                                         @error('position_title') <span class="text-danger">{{ $message }}</span> @enderror
                                     </div>
                                 </div>
                                  
                                
-                                <div class="col-md-8">
+                                <div class="col-md-6">
                                     <div class="position-relative form-group">
                                         <label for="job_description" class="">Job Description</label>
-                                        <input wire:model="job_description"  name="job_description" id="job_description"  class="form-control" required/>
+                                        <input wire:model.defer="job_description"  name="job_description" id="job_description"  class="form-control" required/>
                                         @error('job_description') <span class="text-danger">{{ $message }}</span> @enderror
 
                                     </div>
@@ -45,9 +45,21 @@
                                 <div class="col-md-2">
                                     <div class="position-relative form-group">
                                         <label for="salary_rate" class="">Salary Rate</label>
-                                        <input class="form-control currency" wire:model="salary_rate"  type="number" step='0.01' value='0.00' id="salary_rate" name="salary_rate" placeholder='0.00' required/>
+                                        <input class="form-control currency" wire:model.defer="salary_rate"  type="number" step='0.01' value='0.00' id="salary_rate" name="salary_rate" placeholder='0.00' required/>
                                         @error('salary_rate') <span class="text-danger">{{ $message }}</span> @enderror
                                    
+                                    </div>
+                                </div>
+
+                                <div class="col-md-2">
+                                    <div class="position-relative form-group">
+                                        <label for="has_holiday" class="">With Holidays</label>
+                                        <select class="form-control currency" wire:model.defer="has_holiday" required>
+                                            <option>-- Choose Yes or No --</option>
+                                            <option value="1">Yes</option>
+                                            <option value="0">No</option>
+                                        </select>
+                                        @error('has_holiday') <span class="text-danger">{{ $message }}</span> @enderror
                                     </div>
                                 </div>
                             </div>

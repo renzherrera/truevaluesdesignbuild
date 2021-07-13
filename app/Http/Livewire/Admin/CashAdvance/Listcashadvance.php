@@ -5,6 +5,7 @@ namespace App\Http\Livewire\Admin\CashAdvance;
 use App\Models\CashAdvance;
 use App\Models\Employee;
 use Exception;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -35,7 +36,7 @@ class Listcashadvance extends Component
             'employee_id' => $this->employee_id,
             'cash_amount' => $this->cash_amount,
             'requested_date' => $this->requested_date,
-            'status' => 'Requested',
+            'status' => 'pending',
           
         ]);
 
@@ -147,5 +148,26 @@ class Listcashadvance extends Component
         $this->createMode=true;
         $this->resetInputFields();
         
+    }
+
+    // approve function only superadmin can see this
+    public function approved($id) {
+
+        $cashadvance = CashAdvance::find($id);
+        if(!$cashadvance->approved_by && Auth::user()->role == "superadmin"){
+
+        $cashadvance->update([
+            'approved_by' => Auth::user()->id,
+            'status' => "approved",
+        ]);
+
+
+        $this->emit('swal:modal', [
+            'icon'  => 'success',
+            'title' => 'Success!!',
+            'text'  => "Cash advance for {$cashadvance->employees->first_name} successfully approved!",
+        ]);
+        $this->resetInputFields();
+        }
     }
 }

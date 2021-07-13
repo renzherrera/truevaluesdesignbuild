@@ -14,8 +14,8 @@
                                 </div>
                             </div><div class="col-md-2">
                                 <div class="form-group">
-                                    <label for="payroll_to_date" class="">To<small>(Start Date)</small></label>
-                                    <input  wire:model.defer="payroll_to_date"  type="date" class="form-control" required>
+                                    <label for="payroll_to_date" class="">To<small>(End Date)</small></label>
+                                    <input id  wire:model.defer="payroll_to_date"  type="date" class="form-control" required>
                                     @error('payroll_to_date') <span class="text-danger">{{ $message }}</span> @enderror
                                 </div>
                             </div>

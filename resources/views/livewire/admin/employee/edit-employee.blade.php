@@ -38,7 +38,7 @@
                             <button id="null" wire:click="nullImage()" class="mb-2 mr-2 mt-1 btn-icon btn-icon-only btn-pill btn btn-light position-absolute" style="z-index: 9999999999999999; "><i class="pe-7s-trash btn-icon-wrapper"> </i></button>
   
                                 @endif
-                                <div class="text-center" wire:loading>Uploading...</div>
+                                <div class="text-center" wire:loading wire:target="updated_image">Uploading...</div>
 
                              </div>
                         </div>
