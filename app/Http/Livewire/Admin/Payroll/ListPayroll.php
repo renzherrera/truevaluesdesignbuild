@@ -7,6 +7,7 @@ use App\Models\CashAdvance;
 use App\Models\Employee;
 use App\Models\Holiday;
 use App\Models\Payroll;
+use App\Models\PayrollSummary;
 use App\Models\User;
 use Carbon\Carbon;
 use Exception;
@@ -82,10 +83,12 @@ class ListPayroll extends Component
             
 
 
-
+        }
+        $printedPayrolls = null;
+        if($this->selected_id && $this->payroll_status == "printed"){
+            $printedPayrolls = PayrollSummary::where('payroll_id',$this->selected_id)->paginate(5);
 
         }
-
 
         $searchTerm=$this->searchTerm;
         $payrolls = Payroll::orderBy('id','desc')
@@ -94,7 +97,7 @@ class ListPayroll extends Component
         ->orWhere('payroll_from_date', 'LIKE', "%{$searchTerm}%")
         ->orWhere('payroll_to_date', 'LIKE', "%{$searchTerm}%")
         ->paginate(5);
-        return view('livewire.admin.payroll.list-payroll', compact('payrolls','payrollSummaries','cash_adv','holidays'))->layout('layouts.master');
+        return view('livewire.admin.payroll.list-payroll', compact('payrolls','payrollSummaries','cash_adv','holidays','printedPayrolls'))->layout('layouts.master');
     }
     public function updatingSearchTerm(): void
     {
@@ -168,7 +171,6 @@ class ListPayroll extends Component
         $this->listMode = false;
         $this->summaryMode = true;
 
-
         $payroll = Payroll::with('user')->findOrFail($id);
         $this->selected_id = $id;
         $this->payroll_from_date = $payroll->payroll_from_date;
@@ -189,8 +191,6 @@ class ListPayroll extends Component
         $this->approved_by = '';
         $this->approved_role = '';
        }
-
-
 
     }
     public function update() {
@@ -253,12 +253,13 @@ class ListPayroll extends Component
     public function bulkPayslipPDF()
     {   
         // $payroll_to_date = Carbon::parse($this->payroll_to_date)->format('F d, Y');
-
+        try {
         $payroll_from_date =  $this->payroll_from_date;
         $payroll_to_date = $this->payroll_to_date;
+        $payroll = Payroll::find($this->selected_id);
        
         $holidays = Holiday::where('date','>=',$this->payroll_from_date)->where('date','<=',$this->payroll_to_date)->count();
-        $cash_adv = CashAdvance::whereBetween('requested_date',[$this->payroll_from_date,$this->payroll_to_date])->where('status','!=','paid')->get();
+        $cash_adv = CashAdvance::whereBetween('requested_date',[$this->payroll_from_date,$this->payroll_to_date])->where('status','!=','paid')->where('status','==','approved')->get();
         $first_in = 'CASE WHEN TIMESTAMPDIFF(HOUR, CONCAT(attendances.attendance_date," ",attendances.first_onDuty),
         IFNULL(CONCAT(attendances.attendance_date," ",attendances.first_offDuty),CONCAT(attendances.attendance_date," ","12:00:00")  )  ) > 4 then
         
@@ -302,6 +303,53 @@ class ListPayroll extends Component
         ->get();
 
 
+
+            if($payroll->payroll_status != "printed"){
+
+
+        foreach($payrollSummaries as $payrollSummary){
+            $totalRegularHours = $payrollSummary->total_regular_hours;
+            $totalOvertime = $payrollSummary->total_overtime_hours;
+            $totalHolidayPay = $payrollSummary->regularholiday_pay + $payrollSummary->overtimeholiday_pay;
+            $payGross = $payrollSummary->total_regular_pay + $payrollSummary->total_overtime_pay + $totalHolidayPay;
+            $cashAdvance = $payrollSummary->cashadvances
+            ->where('requested_date','>=',$payroll_from_date)
+            ->where('requested_date','<=', $payroll_to_date)
+            ->where('status','!=','paid')
+            ->sum('cash_amount');
+            $totalPay = $payGross - $cashAdvance;
+
+            PayrollSummary::create([
+                'payroll_id' => $this->selected_id,
+                'employee_name' => $payrollSummary->first_name . ' ' . $payrollSummary->middle_name . ' ' . $payrollSummary->last_name,
+                'position_title' => $payrollSummary->position_title,
+                'project_designated' => $payrollSummary->project->project_name,
+                'schedule' => Carbon::parse($payroll_from_date)->format('F d, Y').' - '.Carbon::parse($payroll_to_date)->format('F d, Y'),
+                'salary_rate' => $payrollSummary->salary_rate,
+                'total_hours_regular' => $totalRegularHours,
+                'total_hours_overtime' => $totalOvertime,
+                'total_holidaypay' => $totalHolidayPay,
+                'salary_gross' => $payGross,
+                'cash_advance' => $cashAdvance,
+                'total_net_pay' => $totalPay,
+            ]);
+
+        }
+
+        if ($this->selected_id) {
+            $payroll->update([
+                'payroll_status' => 'printed',
+            ]);
+    
+          
+          
+    
+        $this->emit('swal:modal', [
+            'icon'  => 'success',
+            'title' => 'Success!!',
+            'text'  => "Payroll successfully created.",
+        ]);
+
         // $projects = Project::join('project_images','projects.id','=','project_images.project_id');
         view()->share('payrollSummaries',$payrollSummaries);
         
@@ -314,6 +362,17 @@ class ListPayroll extends Component
                         ->setOption('footer-left','');
     //    $pdf->setOption('header-html', view('pdf.pdf-header'));
         return $pdf->stream('payslip.pdf');
+      
+        }//end of foreach
+    }// end of if payroll status != printed
+
+        }catch(Exception $ex){
+            $this->emit('swal:modal', [
+                'icon'  => 'error',
+                'title' => 'Error!!',
+                'text'  => "Submition for payroll failed",
+            ]);
+        }
     }
 
 
@@ -345,4 +404,7 @@ class ListPayroll extends Component
         }
 
     }
+
+
+    
 }

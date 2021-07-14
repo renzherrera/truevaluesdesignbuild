@@ -116,6 +116,7 @@ class ListPosition extends Component
 
     public function createPDF()
     {
+        
        $positions = DB::table('positions')
         ->orderBy('position_title')
         ->get();
@@ -126,4 +127,6 @@ class ListPosition extends Component
        $pdf->setOption('header-html', view('pdf.pdf-header'));
         return $pdf->stream('position.pdf');
     }
+
+   
 }

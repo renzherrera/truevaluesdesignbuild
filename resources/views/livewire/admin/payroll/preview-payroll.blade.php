@@ -1,5 +1,5 @@
 <div>
-    <title>Payroll Printed Summary | True Values</title>
+    <title>List of Payrolls | True Values</title>
     <style>
         nav svg{
             height: 20px;
@@ -71,7 +71,7 @@
                                                 <div class="widget-subheading">Total Listed Employees</div>
                                             </div>
                                             <div class="widget-content-right">
-                                                <div class="widget-numbers text-primary">{{$printedPayrolls->count()}}</div>
+                                                <div class="widget-numbers text-primary">{{$payrollSummaries->count()}}</div>
                                             </div>
                                         </div>
                                     </div>
@@ -111,10 +111,9 @@
                                                     $grand_total = $total_gross - $cash_advance;   
                                                     if($grand_total < 0){
                                                         $grand_total = 0;
-                                                    }           
-
+                                                    }                                     
                                                 @endphp
-                                                <div class="widget-numbers text-danger">&#8369; {{number_format($printedPayrolls->sum('total_net_pay'),2)}}</div>
+                                                <div class="widget-numbers text-danger">&#8369; {{number_format($grand_total,2)}}</div>
                                             </div>
                                         </div>
                                     </div>
@@ -180,6 +179,7 @@
                                     
                                     <thead>
                                         <tr>
+                                            <th width="200px">Id</th>
                                             <th>Employee</th>
                                             <th>Regular Shift Hours</th>
                                             <th>Total Overtime <small>Hours</small></th>
@@ -192,37 +192,43 @@
     
                                     </thead>
                                     <tbody>
-                                        @if(!$printedPayrolls)
+                                        @if(!$payrollSummaries)
                                             <tr><td colspan="6" class="text-center"><h4>No payroll data found</h4></td></tr>
                                         
                                         @endif
-                                        @foreach ($printedPayrolls as $printed)
+                                        @foreach ($payrollSummaries as $payrollSummary)
                                         <tr>
                                        
 
-                                            {{-- <td>{{$printed->id}}</td> --}}
-                                            <td>{{$printed->employee_name}}</td>
+                                            <td>{{$payrollSummary->id}}</td>
+                                            <td>{{$payrollSummary->first_name . ' ' . $payrollSummary->middle_name . ' ' . $payrollSummary->last_name}}</td>
                                           
                                              @php
-                                                $perHour = $printed->salary_rate/8;
-                                                $totalRegularHours = $printed->total_hours_regular;
-                                                $totalOvertime = $printed->total_hours_overtime;
+                                                $perHour = $payrollSummary->salary_rate/8;
+                                                $totalRegularHours = $payrollSummary->total_regular_hours;
+                                                $totalOvertime = $payrollSummary->total_overtime_hours;
                                                 $totalHours =  $totalRegularHours + $totalOvertime;
-
+                                                $payGross = $payrollSummary->total_salarypay_with_tax + $payrollSummary->total_overtimepay_with_tax;
+                                                $cashAdvance = $payrollSummary->cashadvances
+                                                                              ->whereBetween('requested_date',[$this->payroll_from_date,$this->payroll_to_date])
+                                                                              ->where('status','==','approved')
+                                                                              ->sum('cash_amount');
+                                                $totalPay = $payGross - $cashAdvance;
+                                                $this->total_pay = $totalPay;
                                             @endphp
                                             <td>{{$totalRegularHours}}</td>
                                             <td>{{$totalOvertime}}</td>
                                             <td>{{$totalHours}}</td>
-                                            <td>{{number_format($printed->salary_gross,2) }}</td>
-                                            <td>{{number_format($printed->cash_advance,2)}}</td>
-                                            <td>{{number_format($printed->total_net_pay,2)}}</td>
+                                            <td>{{number_format($payGross,2) }}</td>
+                                            <td>{{number_format($cashAdvance,2)}}</td>
+                                            <td>{{number_format($totalPay,2)}}</td>
                                             <td class="text-center"><div class="dropdown">
                                                 <button type="button" aria-haspopup="true" aria-expanded="false" data-toggle="dropdown" class="dropdown-toggle btn btn-outline-link"></button>
                                                 <div tabindex="-1" role="menu" aria-hidden="true" class="dropdown-menu" x-placement="bottom-start" style="z-index: 999999;position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(0px, 33px, 0px);">
                                                     <h6 tabindex="-1" class="dropdown-header">Actions</h6>
-                                                        <button wire:click="edit({{$printed->id}})" tabindex="0" class="dropdown-item">Edit</button>
+                                                        <button wire:click="edit({{$payrollSummary->id}})" tabindex="0" class="dropdown-item">Edit</button>
                                                     
-                                                    <button wire:click.prevent="$emit('deletePosition',{{$printed}})" class="dropdown-item" type="button"> Delete</button>
+                                                    <button wire:click.prevent="$emit('deletePosition',{{$payrollSummary}})" class="dropdown-item" type="button"> Delete</button>
                                                 </div>
                                             </div></td>
                                         </tr>    
@@ -232,7 +238,7 @@
                                 </table>
                             </div>
                                   <div class="card-footer justify-content-center">
-                                    {{$printedPayrolls->links('pagination')}}
+                                    {{$payrollSummaries->links('pagination')}}
     
                                   </div>
                                 </div>
@@ -248,7 +254,7 @@
                 <div class="float-right mt-3">
                     <button wire:click.prevent="listMode()" class=" btn btn-warning px-5 py-2 ">Go Back</button>
                     @if ($approved_by)
-                    <button wire:click.prevent="bulkPayslipPDF()" class=" btn btn-primary px-5 py-2 ml-2 ">Print Payslip</button>
+                    <button wire:click.prevent="bulkPayslipPDF($)" class=" btn btn-primary px-5 py-2 ml-2 ">Generate Payslip</button>
                         
                     @endif
                 </div>

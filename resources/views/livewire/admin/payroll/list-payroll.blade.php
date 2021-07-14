@@ -158,8 +158,11 @@
                 </div>
                 
             </div>
-            @else
+            @elseif($payroll_status != "printed")
+            @include('livewire.admin.payroll.preview-payroll')
+            @elseif($payroll_status == "printed")
             @include('livewire.admin.payroll.summary-payroll')
+
 
             @endif
             
