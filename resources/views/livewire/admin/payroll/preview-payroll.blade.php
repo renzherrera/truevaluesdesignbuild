@@ -13,13 +13,44 @@
             margin: 0 !important;
             float: right !important;
         }
+        .modal-backdrop {
+            /* bug fix - no overlay */    
+            display: none;    
+        }
+        .modal {
+            top:20%;
+        }
       </style>
     </head>
     
+    
+
+    <div class="app-page-title">
+        <div class="page-title-wrapper">
+            <div class="page-title-heading">
+                <div class="page-title-icon bg-warning">
+                    <i class="pe-7s-clock text-white">
+                    </i>
+                </div>
+                <div>Preview Summary
+                    <div class="page-title-subheading">In preview summary, you can still edit necessary data (e.g. Attendances, Salary etc.) while there is no approval yet.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>    
         <div class="card no-shadow bg-transparent no-border rm-borders mb-3">
             <div class="card">
-           
-                
+                <div class="card-header">
+                <h4 class="card-title float-left">
+                    @if ($payrolls->projects)
+                    {{$payrolls->projects->project_name}}  
+                    @else
+                    All 
+                     @endif Payroll</h4> 
+{{$this->employee_preview_biometric_id}}
+
+                </div>
                 <div class="no-gutters row">
                     <div class="col-md-12 col-lg-4">
                         <ul class="list-group list-group-flush">
@@ -27,6 +58,8 @@
                                 <div class="widget-content p-0">
                                     <div class="widget-content-outer">
                                         <div class="widget-content-wrapper">
+                                            @if ($payrollSummaries)
+                                                
                                             <div class="widget-content-left">
                                                 <div class="widget-heading">{{$payroll_description}}</div>
                                                 @php
@@ -36,12 +69,13 @@
                                                 <div class="widget-subheading">{{$payrollFrom . ' - ' . $payrollTo}}</div>
                                             </div>
                                             <div class="widget-content-right">
-                                                <div class="widget-numbers text-success">{{ucwords($payroll_status)}}</div>
+                                                <div class="widget-numbers text-warning">{{ucwords($payroll_status)}}</div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </li>
+                            
                             <li class="bg-transparent list-group-item">
                                 <div class="widget-content p-0">
                                     <div class="widget-content-outer">
@@ -50,6 +84,13 @@
                                                 <div class="widget-subheading">Created By</div>
                                                 <div class="widget-heading">{{$prepared_by}} <small>{{ucwords($prepared_role)}}</small></div> 
 
+                                            </div>
+                                            <div class="widget-content-right">
+                                                <div class="widget-numbers text-primary"></div>
+                                            </div>
+                                            <div class="widget-content-left">
+                                                <div class="widget-subheading">Approved By</div>
+                                                <div class="widget-heading">{{$approved_by}}Harold Reyes  <small>{{ucwords($approved_role)}}Superadmin</small></div> 
                                             </div>
                                             <div class="widget-content-right">
                                                 <div class="widget-numbers text-primary"></div>
@@ -82,11 +123,11 @@
                                     <div class="widget-content-outer">
                                         <div class="widget-content-wrapper">
                                             <div class="widget-content-left">
-                                                <div class="widget-subheading">Approved By</div>
-                                                <div class="widget-heading">{{$approved_by}}  <small>{{ucwords($approved_role)}}</small></div> 
+                                                <div class="widget-heading">NO TIME OUT RECORD</div>
+                                                <div class="widget-subheading">Total Listed Employees</div>
                                             </div>
                                             <div class="widget-content-right">
-                                                <div class="widget-numbers text-primary"></div>
+                                                <div class="widget-numbers text-primary">{{$payrollSummaries->count()}}</div>
                                             </div>
                                         </div>
                                     </div>
@@ -184,6 +225,7 @@
                                             <th>Regular Shift Hours</th>
                                             <th>Total Overtime <small>Hours</small></th>
                                             <th>Total Working Hours</th>
+                                            <th>Total Holiday Pay</th>
                                             <th>Gross Salary</th>
                                             <th>Total Cash Advance</th>
                                             <th>Total Pay</th>
@@ -191,6 +233,9 @@
                                         </tr>
     
                                     </thead>
+                                    @endif 
+                                    {{-- end of checking payrollsummaries count --}}
+
                                     <tbody>
                                         @if(!$payrollSummaries)
                                             <tr><td colspan="6" class="text-center"><h4>No payroll data found</h4></td></tr>
@@ -219,6 +264,7 @@
                                             <td>{{$totalRegularHours}}</td>
                                             <td>{{$totalOvertime}}</td>
                                             <td>{{$totalHours}}</td>
+                                            <td>{{$payrollSummary->regularholiday_pay + $payrollSummary->overtimeholiday_pay}}</td>
                                             <td>{{number_format($payGross,2) }}</td>
                                             <td>{{number_format($cashAdvance,2)}}</td>
                                             <td>{{number_format($totalPay,2)}}</td>
@@ -226,7 +272,8 @@
                                                 <button type="button" aria-haspopup="true" aria-expanded="false" data-toggle="dropdown" class="dropdown-toggle btn btn-outline-link"></button>
                                                 <div tabindex="-1" role="menu" aria-hidden="true" class="dropdown-menu" x-placement="bottom-start" style="z-index: 999999;position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(0px, 33px, 0px);">
                                                     <h6 tabindex="-1" class="dropdown-header">Actions</h6>
-                                                        <button wire:click="edit({{$payrollSummary->id}})" tabindex="0" class="dropdown-item">Edit</button>
+                                                    <button wire:click.prevent="viewAttendance({{$payrollSummary->biometric_id}})" class="dropdown-item" data-toggle="modal" data-target=".bd-example-modal-lg">View Attendance</button>
+                                                    <button wire:click="edit({{$payrollSummary->id}})" tabindex="0" class="dropdown-item">Edit</button>
                                                     
                                                     <button wire:click.prevent="$emit('deletePosition',{{$payrollSummary}})" class="dropdown-item" type="button"> Delete</button>
                                                 </div>
@@ -250,13 +297,23 @@
                     </div>
         
                 </div>
+
+
+
+
+ 
+
+
                 
                 <div class="float-right mt-3">
-                    <button wire:click.prevent="listMode()" class=" btn btn-warning px-5 py-2 ">Go Back</button>
+                    <a href="{{route('admin.list-payrolls')}}" class=" btn btn-warning px-5 py-2 ">Go Back</a>
                     @if ($approved_by)
-                    <button wire:click.prevent="bulkPayslipPDF($)" class=" btn btn-primary px-5 py-2 ml-2 ">Generate Payslip</button>
+                    <button wire:click.prevent="$emit('generate')" class=" btn btn-primary px-5 py-2 ml-2 ">Generate Payslip</button>
                         
                     @endif
+                    {{-- @if ($payroll_status == "pending" && Auth::user()->role == "superadmin")
+                    <button wire:click.prevent="approved({{$selected_payroll}})" class=" btn btn-success px-5 py-2 ml-2 ">Approve</button>
+                    @endif --}}
                 </div>
             </div>
             {{-- @endif --}}
@@ -278,6 +335,7 @@
                         if (result.value) {
                             // calling destroy method to delete
                             @this.call('destroy',id)
+                            location.reload();
                         } else if (result.dismiss === Swal.DismissReason.cancel) {
                             Swal.fire(
                                 'Cancelled',
@@ -287,9 +345,168 @@
                         }
                     });
                 })
+
+                @this.on('generate', id => {
+                    Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You won't be able to revert this!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Confirm',
+                    cancelButtonText: 'Cancel',
+                    reverseButtons: true
+                    }).then((result) => {
+                        //if user clicks on delete
+                        if (result.value) {
+                            // calling destroy method to delete
+                            @this.call('bulkPayslipPDF')
+                        } else if (result.dismiss === Swal.DismissReason.cancel) {
+                            Swal.fire(
+                                'Cancelled',
+                                'Deleting data cancelled :)',
+                                'error'
+                            )
+                        }
+                    });
+                })
+
+
             })
         </script>
-        
+
+
+<!-- Large modal -->
+
+<div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Attendance Summary</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class=" table-responsive " style="height: 325px;">
+                                                
+                    <table  class="table table-striped table-bordered" id="position-table" >
+                     
+                     <thead>
+                         <tr>
+                             <th>Date</th>
+                             <th>Time-in</th>
+                             <th>Time-out</th>
+                             <th>Total hours</th>
+                             <th>Time-in <small>[Overtime]</small></th>
+                             <th>Time-out <small>[Overtime]</small></th>
+                             <th>Ot hours</th>
+                             <th class="text-center" width="50px">Action</th>
+                         </tr>
+
+                     </thead>
+                     <tbody>
+                         @if($attendances->count() < 1)
+                             <tr><td colspan="100%" class="text-center"><h4>No attendance data found.</h4></td></tr>
+                         
+                         @endif
+                             
+                         @foreach ($attendances as $attendance)
+
+                         <tr>
+                             <td>{{ Carbon\Carbon::parse($attendance->attendance_date)->format('F d, Y') }}</td>
+                             <td>{{ Carbon\Carbon::parse($attendance->first_onDuty)->format('g:i A') }}</td>
+                             <td class="text-center">
+                                 @if ($attendance->first_offDuty)
+                                 {{ Carbon\Carbon::parse($attendance->first_offDuty)->format('g:i A') }}
+                                 @else
+                                 -
+                                 @endif
+                             </td>
+                             @php
+                             $timeIn = \Carbon\Carbon::parse($attendance->first_onDuty);
+                             $timeOut = \Carbon\Carbon::parse($attendance->first_offDuty);
+                             $ottimeIn = \Carbon\Carbon::parse($attendance->second_onDuty);
+                             $ottimeOut = \Carbon\Carbon::parse($attendance->second_offDuty);
+                             $otdiffInHours = round($ottimeOut->diffInMinutes($ottimeIn) / 60) ; 
+                            
+                             if ($attendance->first_offDuty){
+                             $diffInHours = round($timeOut->diffInMinutes($timeIn) / 60);
+                                 if($diffInHours >4){
+                                 $diffInHours = round($timeOut->diffInMinutes($timeIn) / 60) - 1; 
+                                     }
+                             }
+                             elseif($attendance->second_onDuty && !$attendance->first_offDuty){
+                             $diffInHours = round($ottimeIn->diffInMinutes($timeIn) / 60);
+                             if($diffInHours > 8){
+                                 $diffInHours =8;
+                             }
+                             }
+                             else {
+                             $diffInHours= 4;
+                             }
+
+                             // if($diffInHours >4){
+                             // $diffInHours = round($timeOut->diffInMinutes($timeIn) / 60) - 1; 
+                             // }
+                            
+                             if($otdiffInHours >4){
+                             $otdiffInHours = round($ottimeOut->diffInMinutes($ottimeIn) / 60) - 1; 
+                             }
+                             
+                             if (!$attendance->second_offDuty){ 
+                                 $otdiffInHours= 0;
+                             }
+                            
+                            @endphp
+                         <td>{{$diffInHours}}</td>
+                             <td>
+                                 @if ($attendance->second_onDuty)
+                                 {{ Carbon\Carbon::parse($attendance->second_onDuty)->format('g:i A') }}
+                                 @else
+                                 -
+                                 @endif
+                             </td>
+                           
+                             <td>
+                                 @if ($attendance->second_offDuty)
+                                 {{ Carbon\Carbon::parse($attendance->second_offDuty)->format('g:i A') }}
+                                 @else
+                                 -
+                                 @endif
+                             </td>
+                              <td>{{$otdiffInHours}}</td>
+
+                             <td class="text-center"><div class="dropdown">
+                                 <button type="button" aria-haspopup="true" aria-expanded="false" data-toggle="dropdown" class="dropdown-toggle btn btn-outline-link"></button>
+                                 <div tabindex="-1" role="menu" aria-hidden="true" class="dropdown-menu" x-placement="bottom-start" style="z-index: 999999;position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(0px, 33px, 0px);">
+                                     <h6 tabindex="-1" class="dropdown-header">Actions</h6>
+                                         <button wire:click="edit({{$attendance->id}})" tabindex="0" class="dropdown-item">Edit</button>
+                                     <button wire:click.prevent="$emit('deleteAttendance',{{$attendance->id}})" class="dropdown-item" type="button"> Delete</button>
+                                 </div>
+                             </div></td>
+                         </tr>    
+                         @endforeach
+                         
+                     </tbody>
+                   </table>
+                   </div>
+                   <div class="card-footer justify-content-center">
+                     {{$attendances->links('pagination')}}
+
+                   </div>
+                 </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+   
     </div>
     
     

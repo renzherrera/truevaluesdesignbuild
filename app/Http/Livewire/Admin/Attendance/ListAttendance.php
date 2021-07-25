@@ -5,6 +5,8 @@ namespace App\Http\Livewire\Admin\Attendance;
 use App\Imports\AttendanceImport;
 use App\Models\Attendance;
 use App\Models\Employee;
+use App\Models\Project;
+use Carbon\Carbon;
 use Exception;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -16,15 +18,81 @@ class ListAttendance extends Component
     use WithPagination;
     use WithFileUploads;
     public $importExcelFile,$selected_id, $biometric_id, $attendance_date, $first_onDuty,$first_offDuty=null,$second_onDuty=null,$second_offDuty=null,
-            $createMode = true, $updateMode= false;
+            $createMode = true, $updateMode= false,$noTimeOutRecords,$start = null,$end = null, $searchTerm,$project_id,$lateCounts;
     public function render()
     {
-        
-        $employees = Employee::select('biometric_id','first_name','middle_name','last_name')->whereNotNull('biometric_id')->get();
-        $attendances = Attendance::has('employees')->orderBy('attendance_date','desc')->orderBy('first_onDuty','asc')
-        ->paginate(5);
+        $searchTerm = $this->searchTerm;
+        //covert daterangepicker value to laravel date
+        $start = Carbon::parse($this->start)->toDateTimeString();
+        $end = Carbon::parse($this->end)->toDateTimeString();
 
-        return view('livewire.admin.attendance.list-attendance',compact('attendances','employees'))->layout('layouts.master');
+        //get employees info
+        $employees = Employee::select('biometric_id','first_name','middle_name','last_name')->whereNotNull('biometric_id')->get();
+
+        //get projects
+        $projects = Project::select('id','project_name')->get();
+    
+        //search query only if input box filled
+
+        //NOTIME OUT RECORDS
+        $noTimeOutRecords = Attendance::has('employees');
+
+        //count late counts
+        $lateCounts = Attendance::has('employees')->whereRaw('attendances.first_onDuty > schedules.start_time');
+       
+        
+        //get all attendance
+        $attendances = Attendance::has('employees')->orderBy('attendance_date','desc')->orderBy('first_onDuty','asc');
+
+        if($searchTerm){
+            $attendances = $attendances
+            ->where('employees.first_name', 'LIKE', "%{$searchTerm}%")
+            // ->orWhere('employees.id', '=', "{$searchTerm}")
+            ->orWhere('employees.middle_name', 'LIKE', "%{$searchTerm}%")
+            ->orWhere('employees.last_name', 'LIKE', "%{$searchTerm}%");
+
+            $lateCounts = $lateCounts->orWhere('employees.first_name', 'LIKE', "%{$searchTerm}%")
+            // ->orWhere('employees.id', '=', "{$searchTerm}")
+            ->orWhere('employees.middle_name', 'LIKE', "%{$searchTerm}%")
+            ->orWhere('employees.last_name', 'LIKE', "%{$searchTerm}%");
+            
+            $noTimeOutRecords = $noTimeOutRecords->where('employees.first_name', 'LIKE', "%{$searchTerm}%")
+            // ->orWhere('employees.id', '=', "{$searchTerm}")
+            ->orWhere('employees.middle_name', 'LIKE', "%{$searchTerm}%")
+            ->orWhere('employees.last_name', 'LIKE', "%{$searchTerm}%");
+
+
+            }
+
+        if($this->project_id){
+            $attendances = $attendances->where('employees.project_id',$this->project_id);
+            
+
+        }
+
+        if($this->start && $this->end){
+        $attendances = $attendances
+        ->whereBetween('attendance_date',[$start,$end]);
+        }
+       //paginate attendances
+
+      
+        //results finalizing
+        $noTimeOutRecords = $noTimeOutRecords
+        ->where('second_onDuty',null)->where('first_offDuty',null)
+        ->join('employees', 'attendances.biometric_id', '=', 'employees.biometric_id')
+        ->join('schedules', 'schedules.id', '=', 'employees.schedule_id')
+        ->count();
+        $lateCounts = $lateCounts
+        ->join('employees', 'attendances.biometric_id', '=', 'employees.biometric_id')
+        ->join('schedules', 'schedules.id', '=', 'employees.schedule_id')->count();
+        $attendances = $attendances->join('employees', 'attendances.biometric_id', '=', 'employees.biometric_id')->paginate(5);
+
+
+        $this->lateCounts = $lateCounts;
+        $this->noTimeOutRecords = $noTimeOutRecords;
+    
+        return view('livewire.admin.attendance.list-attendance',compact('attendances','employees','projects'))->layout('layouts.master');
     }
     public function updatingSearchTerm(): void
     {
@@ -74,10 +142,12 @@ class ListAttendance extends Component
     
     public function edit($id)
     {
+        $attendance = Attendance::findOrFail($id);
+
+        if($attendance->attendance_status == "unpaid"){
         $this->createMode = false;
         $this->updateMode = true;
 
-        $attendance = Attendance::findOrFail($id);
         $this->selected_id = $id;
         $this->biometric_id = $attendance->biometric_id;
         $this->attendance_date = $attendance->attendance_date;
@@ -85,6 +155,13 @@ class ListAttendance extends Component
         $this->first_offDuty = $attendance->first_offDuty;
         $this->second_onDuty = $attendance->second_onDuty;
         $this->second_offDuty = $attendance->second_offDuty;
+    }else{
+        $this->emit('swal:modal', [
+            'icon'  => 'info',
+            // 'title' => 'Success!!',
+            'text'  => 'You cannot edit attendance if it was already paid. <br> <small>If you still wish to do that, you have to delete the payroll where this attendance existed</small>',
+        ]);
+    }
 
     }
 
@@ -102,7 +179,6 @@ class ListAttendance extends Component
             $this->resetInputFields();
 
         }catch(Exception $ex){
-            $this->resetInputFields();
 
             $this->emit('swal:alert', [
                 'icon'  => 'error',
@@ -120,7 +196,7 @@ class ListAttendance extends Component
 
     public function resetInputFields()
     {
-        $this->importExcelFile=null;
+        $this->importExcelFile='';
         $this->biometric_id='';
         $this->attendance_date=null;
         $this->first_onDuty=null;

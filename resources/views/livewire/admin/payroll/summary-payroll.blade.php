@@ -15,11 +15,25 @@
         }
       </style>
     </head>
-    
+    <div class="app-page-title">
+        <div class="page-title-wrapper">
+            <div class="page-title-heading">
+                <div class="page-title-icon bg-success">
+                    <i class="pe-7s-check  text-white">
+                    </i>
+                </div>
+                <div>Approved Summary
+                    <div class="page-title-subheading">You cannot edit data once it was approved, this will be served as a copy of payslips.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>    
         <div class="card no-shadow bg-transparent no-border rm-borders mb-3">
             <div class="card">
-           
-                
+                <div class="card-header">
+                    <h6>Approved Summary</h6>
+                </div>
                 <div class="no-gutters row">
                     <div class="col-md-12 col-lg-4">
                         <ul class="list-group list-group-flush">
@@ -36,7 +50,12 @@
                                                 <div class="widget-subheading">{{$payrollFrom . ' - ' . $payrollTo}}</div>
                                             </div>
                                             <div class="widget-content-right">
-                                                <div class="widget-numbers text-success">{{ucwords($payroll_status)}}</div>
+                                                <div class="widget-numbers 
+                                                @if ($payroll_status == "approved")
+                                                text-success  
+                                                @elseif ($payroll_status == "printed")
+                                                text-primary  
+                                                @endif ">{{ucwords($payroll_status)}}</div>
                                             </div>
                                         </div>
                                     </div>
@@ -105,7 +124,7 @@
                                                 <div class="widget-subheading">Total Salaries Amount</div>
                                             </div>
                                             <div class="widget-content-right">
-                                                @php
+                                                {{-- @php
                                                     $total_gross = $payrollSummaries->sum('total_salarypay_with_tax') + $payrollSummaries->sum('total_overtimepay_with_tax');
                                                     $cash_advance = $cash_adv->sum('cash_amount');
                                                     $grand_total = $total_gross - $cash_advance;   
@@ -113,8 +132,8 @@
                                                         $grand_total = 0;
                                                     }           
 
-                                                @endphp
-                                                <div class="widget-numbers text-danger">&#8369; {{number_format($printedPayrolls->sum('total_net_pay'),2)}}</div>
+                                                @endphp --}}
+                                                <div class="widget-numbers text-danger">&#8369; {{number_format($printedPayrolls->sum('total_net_pay') - $printedPayrolls->sum('cash_advance'),2)}}</div>
                                             </div>
                                         </div>
                                     </div>
@@ -151,18 +170,25 @@
                                 <div class="col-sm-12  date-filter" style="width: 100%">
                                             
                                             <div class="form-row ">
-                                                <div class="col-md-4 ">
-                                                
-                                                </div>
-                                                <div class="col-md-12 float-right">
+                                              
+                                                <div class="col-md-12 ">
                                                     <div class="dropdown  float-left">
                                                         <button type="button" aria-haspopup="true" aria-expanded="true" data-toggle="dropdown" class="mb-2 mr-2 dropdown-toggle btn btn-outline-alternate">Export / Download</button>
+                                                        
                                                         <div tabindex="-1" role="menu" aria-hidden="true" class="dropdown-menu" x-placement="bottom-start" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(-7px, 33px, 0px);">
                                                             <button type="button" tabindex="0" class="dropdown-item" wire:click="createPDF()">PDF</button>
                                                             <button type="button" tabindex="0" class="dropdown-item">Excel</button>
-                                                          
                                                         </div>
                                                     </div>
+                                                    <div class="dropdown  float-left">
+                                                        <select name="" id="" class="form-control" style="font-size:12px !important; height:35px;">
+                                                            <option value="" ><small> -- Select Work Designated -- </small></option>
+                                                            <option value="">Project 1</option>
+                                                            <option value="">JGM</option>
+                                                        </select>
+                                                       
+                                                    </div>
+                                                   
                                                     <div class="search-wrapper active float-right">
                                                         <div class="input-holder ">
     
@@ -171,6 +197,7 @@
                                                             <button class="search-icon"><span></span></button>
                                                         </div>
                                                     </div>
+                                                    @dd($printedPayrolls)
                                                    
                                                 </div>
                                             </div>
@@ -180,14 +207,18 @@
                                     
                                     <thead>
                                         <tr>
-                                            <th>Employee</th>
+                                            <th>Employee ID</th>
+                                            <th>Biometric ID</th>
+                                            <th width="20%">Employee</th>
+                                            <th>Work Area</th>
                                             <th>Regular Shift Hours</th>
                                             <th>Total Overtime <small>Hours</small></th>
                                             <th>Total Working Hours</th>
+                                            <th>Total Holiday Pay</th>
                                             <th>Gross Salary</th>
                                             <th>Total Cash Advance</th>
                                             <th>Total Pay</th>
-                                            <th class="text-center" width="150px">Action</th>
+                                            <th class="text-center" width="50px">Action</th>
                                         </tr>
     
                                     </thead>
@@ -200,9 +231,13 @@
                                         <tr>
                                        
 
-                                            {{-- <td>{{$printed->id}}</td> --}}
-                                            <td>{{$printed->employee_name}}</td>
-                                          
+                                            <td>{{$printed->employee_id}}</td>
+                                            <td>{{$printed->biometric_id}}</td>
+                                            <td class="text-left"><strong>{{$printed->employee_name}}</strong>
+                                            <p style=" margin:-5px 0 0 0 ;"><small>{{$printed->position_title}}</small></p>
+                                            </td>
+                                            <td>{{$printed->project_designated}}</td>
+                                       
                                              @php
                                                 $perHour = $printed->salary_rate/8;
                                                 $totalRegularHours = $printed->total_hours_regular;
@@ -213,6 +248,7 @@
                                             <td>{{$totalRegularHours}}</td>
                                             <td>{{$totalOvertime}}</td>
                                             <td>{{$totalHours}}</td>
+                                            <td>{{number_format($printed->total_holidaypay,2) }}</td>
                                             <td>{{number_format($printed->salary_gross,2) }}</td>
                                             <td>{{number_format($printed->cash_advance,2)}}</td>
                                             <td>{{number_format($printed->total_net_pay,2)}}</td>
@@ -220,9 +256,8 @@
                                                 <button type="button" aria-haspopup="true" aria-expanded="false" data-toggle="dropdown" class="dropdown-toggle btn btn-outline-link"></button>
                                                 <div tabindex="-1" role="menu" aria-hidden="true" class="dropdown-menu" x-placement="bottom-start" style="z-index: 999999;position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(0px, 33px, 0px);">
                                                     <h6 tabindex="-1" class="dropdown-header">Actions</h6>
-                                                        <button wire:click="edit({{$printed->id}})" tabindex="0" class="dropdown-item">Edit</button>
-                                                    
-                                                    <button wire:click.prevent="$emit('deletePosition',{{$printed}})" class="dropdown-item" type="button"> Delete</button>
+                                                        <button wire:click="printSinglePayslip({{$printed->id}})" tabindex="0" class="dropdown-item">Print Payslip</button>
+                                                        <button wire:click="printSinglePayslip({{$printed->id}})" tabindex="0" class="dropdown-item">View Attendance</button>
                                                 </div>
                                             </div></td>
                                         </tr>    
@@ -246,11 +281,11 @@
                 </div>
                 
                 <div class="float-right mt-3">
-                    <button wire:click.prevent="listMode()" class=" btn btn-warning px-5 py-2 ">Go Back</button>
+                    <a href="{{route('admin.list-payrolls')}}" class=" btn btn-warning px-5 py-2 ">Go Back</a>
                     @if ($approved_by)
                     <button wire:click.prevent="bulkPayslipPDF()" class=" btn btn-primary px-5 py-2 ml-2 ">Print Payslip</button>
-                        
                     @endif
+                 
                 </div>
             </div>
             {{-- @endif --}}

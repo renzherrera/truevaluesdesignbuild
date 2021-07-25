@@ -24,13 +24,27 @@
                                     @error('position_title') <span class="text-danger">{{ $message }}</span> @enderror
                                 </div>
                             </div>
-                            <div class="col-md-8">
+                            <div class="col-md-6">
                                 <div class="position-relative form-group">
                                     <label for="job_description" class="">Payroll Description</label>
                                     <input wire:model.defer="payroll_description"  name="job_description" id="payroll_description"  class="form-control" required/>
                                     @error('job_description') <span class="text-danger">{{ $message }}</span> @enderror
                                 </div>
                             </div> 
+                            <div class="col-md-2">
+                                <div class="position-relative form-group">
+                                    <label for="">Project / Department</label>
+                                <select name="" id="" wire:model.defer = "project_id" class="form-control" style="font-size: 14px;">
+                                    <option value="0"> All </option>
+                                    @foreach ($projects as $project)
+                                    <option value="{{$project->id}}">{{$project->project_name}}</option>
+                                        
+                                    @endforeach
+                                </select>
+                                @error('project_id') <span class="text-danger">{{ $message }}</span> @enderror
+
+                                </div>
+                            </div>
                             
                         </div>
                          <button wire:click.prevent="update()" class=" btn btn-primary px-5 py-2  float-right">Save changes</button>

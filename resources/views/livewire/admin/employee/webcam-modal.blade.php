@@ -27,7 +27,7 @@
                 <button id="capture_btn" type="button" class="btn btn-warning" onclick="preview_snapshot()">Capture</button>
                 <button id="save_btn" type="button" class="btn btn-primary"  onclick="saveSnapshot()" data-dismiss="modal" onclick="offCam()">Save changes</button>
        
-                <input type="hidden" name="captured_image" id="input_webcam" class="image-tag" wire:model.defer="captured_image">
+                <input type="text" name="captured_image" id="input_webcam" class="image-tag" wire:model.defer="captured_image">
             </div>
         </div>
     </div>

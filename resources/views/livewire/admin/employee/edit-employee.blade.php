@@ -29,14 +29,13 @@
                                 <img style="display:block; text-align:center; position: absolute;
                                 top: 50%; transform: translateY(-50%);   margin: auto;
                                 width: 130px;  z-index: 0;" src=" {{$updated_image->temporaryUrl()}}" alt="">
-                             <button id="reset" class="mb-2 mr-2 mt-1 btn-icon btn-icon-only btn-pill btn btn-light position-absolute" wire:click="originalImage()" style="z-index: 999999999999; "><i class="pe-7s-refresh btn-icon-wrapper"> </i></button>
+                                 <button id="reset" class="mb-2 mr-2 mt-1 btn-icon btn-icon-only btn-pill btn btn-light position-absolute" wire:click="originalImage()" style="z-index: 999999999999; "><i class="pe-7s-refresh btn-icon-wrapper"> </i></button>
                                 
                                 @elseif($image)
                                 <img style="display:block; text-align:center; position: absolute;
                                 top: 50%; transform: translateY(-50%);   margin: auto;
                                 width: 130px;  z-index: 0;" src=" {{asset('storage/employee_images/'.$image)}}" alt="">
-                            <button id="null" wire:click="nullImage()" class="mb-2 mr-2 mt-1 btn-icon btn-icon-only btn-pill btn btn-light position-absolute" style="z-index: 9999999999999999; "><i class="pe-7s-trash btn-icon-wrapper"> </i></button>
-  
+                                   <button id="null" wire:click="nullImage()" class="mb-2 mr-2 mt-1 btn-icon btn-icon-only btn-pill btn btn-light position-absolute" style="z-index: 9999999999999999; "><i class="pe-7s-trash btn-icon-wrapper"> </i></button>
                                 @endif
                                 <div class="text-center" wire:loading wire:target="updated_image">Uploading...</div>
 

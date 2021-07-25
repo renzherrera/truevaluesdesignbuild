@@ -16,9 +16,16 @@ class Payroll extends Model
         'payroll_status',
         'prepared_by',
         'approved_by',
+        'project_id',
     ];
 
-    public function user() {
-        return $this->belongsTo(User::class);
+    public function userApprovedBy() {
+        return $this->belongsTo(User::class,'approved_by','id');
+    }
+    public function userPreparedBy() {
+        return $this->belongsTo(User::class,'prepared_by','id');
+    }
+    public function projects() {
+        return $this->belongsTo(Project::class,'project_id','id');
     }
 }

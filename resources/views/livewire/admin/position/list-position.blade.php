@@ -17,7 +17,6 @@
 </head>
 
    
-    <div class="app-main__inner">
         
     
         @if ($updateMode)
@@ -137,7 +136,6 @@
     
             </div>
             
-        </div>
     </div>
         
     <script>

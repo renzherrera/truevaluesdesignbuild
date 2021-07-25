@@ -28,6 +28,8 @@ class CreateEmployeesTable extends Migration
             $table->text('address');
             $table->string('status');
             $table->string('image')->nullable();
+            $table->unsignedInteger('biometric_id')->nullable();
+            $table->string('card_number')->nullable();
             $table->timestamps();
         });
     }

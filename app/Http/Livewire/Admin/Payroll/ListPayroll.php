@@ -8,96 +8,42 @@ use App\Models\Employee;
 use App\Models\Holiday;
 use App\Models\Payroll;
 use App\Models\PayrollSummary;
+use App\Models\Project;
 use App\Models\User;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithPagination;
 use PDF;
 class ListPayroll extends Component
 {
     public $payroll_from_date ,$payroll_to_date,$payroll_description,$total_pay,$payroll_status,
-    $createMode = true, $updateMode= false,$summaryMode = false, $selected_id,$searchTerm,$prepared_by,$approved_by,$approved_role,$prepared_role
-   ;
+    $createMode = true, $updateMode= false,$summaryMode = false,$listMode = true,$previewMode, $selected_id,$searchTerm,$prepared_by,$approved_by,$approved_role,$prepared_role,
+    $start = null,$end = null, $project_id;
     use WithPagination;
     public function render()
     {
-
-        $payrollSummaries = null;
         $cash_adv = null;
         $holidays = null;
-        if($this->summaryMode){
-        
-        //IF TIME_IN IS NOT BLANK AND TIME_OUT IS BLANK = HALF DAY OR 4 HOURS
-         //IF TOTAL REGULAR HOURS PER DAY IS GREATER THAN 4 (HALFDAY), THEN TOTAL HOURS LESS 1 HOUR FOR BREAK
-          //IF OVERTIME HAS TIME_IN AND TIME_OUT THEN TOTAL HOURS
-           //IF OVERTIME HAS TIME_IN AND TIME_OUT IS BLANK THEN THE OVERTIME IS VOIDED OR 0
-            //IF POSITION HAS_HOLIDAY = TRUE THEN EMPLOYEE WILL HAVE HOLIDAY PAY
-        $holidays = Holiday::where('date','>=',$this->payroll_from_date)->where('date','<=',$this->payroll_to_date)->count();
-       
-        $cash_adv = CashAdvance::whereBetween('requested_date',[$this->payroll_from_date,$this->payroll_to_date])->where('status','!=','paid')->get();
-        $first_in = 'CASE WHEN TIMESTAMPDIFF(HOUR, CONCAT(attendances.attendance_date," ",attendances.first_onDuty),
-        IFNULL(CONCAT(attendances.attendance_date," ",attendances.first_offDuty),CONCAT(attendances.attendance_date," ","12:00:00")  )  ) > 4 then
-        
-        TIMESTAMPDIFF(HOUR, CONCAT(attendances.attendance_date," ",attendances.first_onDuty),
-        IFNULL(CONCAT(attendances.attendance_date," ",attendances.first_offDuty),CONCAT(attendances.attendance_date," ","12:00:00")  )  ) -1 ELSE
-
-        TIMESTAMPDIFF(HOUR, CONCAT(attendances.attendance_date," ",attendances.first_onDuty),
-        IFNULL(CONCAT(attendances.attendance_date," ",attendances.first_offDuty),CONCAT(attendances.attendance_date," ","12:00:00")  )  ) END
-        ';
-
-        //Overtime time in / total working hours in the day(time in - timeout) if time_out is null then overtime is voided or = 0 ot hours in the day
-        $overtime_in = 'TIMESTAMPDIFF(HOUR, CONCAT(attendances.attendance_date," ",attendances.second_onDuty),
-        IFNULL(CONCAT(attendances.attendance_date," ",attendances.second_offDuty),CONCAT(attendances.attendance_date," ",second_offDuty)   )  )';
-        $regular_salary_holiday = '(positions.salary_rate *
-        CASE WHEN positions.has_holiday = true then
-        (CASE WHEN attendances.attendance_date = holidays.date THEN holidays.rate ELSE 1 END) ELSE 1 END /8)';
-        $overtime_salary_holiday = '(positions.salary_rate * 
-        CASE WHEN positions.has_holiday = true then
-        (CASE WHEN attendances.attendance_date = holidays.date THEN holidays.ot_rate ELSE 1 END)ELSE 1 END /8)';
-
-        $payrollSummaries = Employee::selectRaw('employees.*,positions.salary_rate,ROUND(SUM('.$first_in.')) AS total_regular_hours,
-
-         SUM(ROUND('.$first_in.' *  '.$regular_salary_holiday.'  
-         )) AS total_salarypay_with_tax,
-         SUM(ROUND(('.$first_in.')  * '.$regular_salary_holiday.' - (('.$first_in.')*(positions.salary_rate))/8       )) AS regularholiday_pay,
-         SUM(ROUND(('.$first_in.' )  * (positions.salary_rate * 1 /8) )) AS total_regular_pay,
-
-
-         SUM(ROUND( '.$overtime_in.' )) AS total_overtime_hours,
-         SUM(ROUND(('.$overtime_in.' )  * '.$overtime_salary_holiday.' )) AS total_overtimepay_with_tax,
-         SUM(ROUND(('.$overtime_in.' )  * (positions.salary_rate * 1 /8) )) AS total_overtime_pay,
-         SUM(ROUND(('.$overtime_in.' )  * '.$overtime_salary_holiday.' - (('.$overtime_in.' )*(positions.salary_rate))/8       )) AS overtimeholiday_pay
-         
-         ')
-         
-        ->whereBetween('attendances.attendance_date',[$this->payroll_from_date,$this->payroll_to_date])
-        ->leftJoin('attendances', 'attendances.biometric_id', '=', 'employees.biometric_id')
-        ->leftJoin('holidays', 'holidays.date', '=', 'attendances.attendance_date')
-        // ->leftJoin('cash_advances', 'cash_advances.employee_id', '=', 'employees.id')
-        ->leftJoin('positions', 'employees.position_id', '=', 'positions.id')
-        ->groupBy('employees.id')
-        ->paginate(5);
-            
-
-
-        }
-        $printedPayrolls = null;
-        if($this->selected_id && $this->payroll_status == "printed"){
-            $printedPayrolls = PayrollSummary::where('payroll_id',$this->selected_id)->paginate(5);
-
-        }
-
         $searchTerm=$this->searchTerm;
-        $payrolls = Payroll::orderBy('id','desc')
+        $start = Carbon::parse($this->start)->toDateTimeString();
+        $end = Carbon::parse($this->end)->toDateTimeString();
+        $projects = Project::select('id','project_name')->get();
+        $payrolls = Payroll::orderBy('id','desc');
+        if($searchTerm){
+        $payrolls = $payrolls
         ->orWhere('id', 'LIKE', "%{$searchTerm}%")
         ->orWhere('payroll_description', 'LIKE', "%{$searchTerm}%")
         ->orWhere('payroll_from_date', 'LIKE', "%{$searchTerm}%")
-        ->orWhere('payroll_to_date', 'LIKE', "%{$searchTerm}%")
-        ->paginate(5);
-        return view('livewire.admin.payroll.list-payroll', compact('payrolls','payrollSummaries','cash_adv','holidays','printedPayrolls'))->layout('layouts.master');
+        ->orWhere('payroll_to_date', 'LIKE', "%{$searchTerm}%");
+        }
+        if($this->start && $this->end){
+            $payrolls = $payrolls
+            ->whereBetween('payroll_from_date',[$start,$end]);
+        }
+        $payrolls = $payrolls->paginate(5);
+        return view('livewire.admin.payroll.list-payroll', compact('payrolls','cash_adv','holidays','projects'))->layout('layouts.master');
     }
     public function updatingSearchTerm(): void
     {
@@ -113,15 +59,16 @@ class ListPayroll extends Component
             'payroll_description' => 'required',
            
         ]); 
-
-
-         Payroll::create([
+       $insertPayroll = Payroll::create([
             'payroll_from_date' => $this->payroll_from_date,
             'payroll_to_date' => $this->payroll_to_date,
             'payroll_description' => $this->payroll_description,
             'prepared_by' => $auth_user,
             'payroll_status' => "pending",
+            'project_id' => $this->project_id,
         ]);
+
+
         $this->resetInputFields();
         $this->emit('swal:modal', [
             'icon'  => 'success',
@@ -137,6 +84,8 @@ class ListPayroll extends Component
         $this->createMode = true;
         $this->updateMode = false;
         $this->summaryMode = false;
+        $this->listMode = true;
+
         $this->resetInputFields();
     }
 
@@ -152,6 +101,7 @@ class ListPayroll extends Component
     
     public function edit($id)
     {
+
         $this->createMode = false;
         $this->updateMode = true;
         $this->summaryMode = false;
@@ -161,38 +111,12 @@ class ListPayroll extends Component
         $this->payroll_from_date = $payroll->payroll_from_date;
         $this->payroll_to_date = $payroll->payroll_to_date;
         $this->payroll_description = $payroll->payroll_description;
+        $this->project_id = $payroll->project_id;
 
     }
 
-    public function payrollSummary($id)
-    {
-        $this->createMode = false;
-        $this->updateMode = false;
-        $this->listMode = false;
-        $this->summaryMode = true;
-
-        $payroll = Payroll::with('user')->findOrFail($id);
-        $this->selected_id = $id;
-        $this->payroll_from_date = $payroll->payroll_from_date;
-        $this->payroll_to_date = $payroll->payroll_to_date;
-        $this->payroll_description = $payroll->payroll_description;
-        $this->payroll_status = $payroll->payroll_status;
-        $this->prepared_by = $payroll->prepared_by;
-        $this->approved_by = $payroll->approved_by;
-        $preparedBy = User::findOrFail($this->prepared_by);
-        $this->prepared_role = $preparedBy->role;
-        $this->prepared_by = $preparedBy->name;
-
-        if($payroll->approved_by){
-        $approvedBy = User::findOrFail($this->approved_by);
-        $this->approved_by = $approvedBy->name;
-        $this->approved_role = $preparedBy->role;
-       } else{
-        $this->approved_by = '';
-        $this->approved_role = '';
-       }
-
-    }
+    
+    
     public function update() {
         $this->validate([
             'payroll_from_date' => 'required|date',
@@ -207,6 +131,7 @@ class ListPayroll extends Component
             'payroll_from_date' => $this->payroll_from_date,
             'payroll_to_date' => $this->payroll_to_date,
             'payroll_description' => $this->payroll_description,
+            'project_id' => $this->project_id,
         ]);
         $this->updateMode = false;
         $this->createMode = true;
@@ -238,7 +163,6 @@ class ListPayroll extends Component
                 'icon'  => 'error',
                 'title' => 'Error!!',
                 'text'  => "Deletion failed. {$ex->getMessage()}",
-
             ]);
         }
       
@@ -246,46 +170,40 @@ class ListPayroll extends Component
 
     public function createMode() {
         $this->createMode = true;
+        $this->listMode = true;
         $this->updateMode = false;
         $this->resetInputFields();
     }
 
-    public function bulkPayslipPDF()
+    public function approved($id)
     {   
         // $payroll_to_date = Carbon::parse($this->payroll_to_date)->format('F d, Y');
+
         try {
-        $payroll_from_date =  $this->payroll_from_date;
-        $payroll_to_date = $this->payroll_to_date;
-        $payroll = Payroll::find($this->selected_id);
-       
-        $holidays = Holiday::where('date','>=',$this->payroll_from_date)->where('date','<=',$this->payroll_to_date)->count();
-        $cash_adv = CashAdvance::whereBetween('requested_date',[$this->payroll_from_date,$this->payroll_to_date])->where('status','!=','paid')->where('status','==','approved')->get();
-        $first_in = 'CASE WHEN TIMESTAMPDIFF(HOUR, CONCAT(attendances.attendance_date," ",attendances.first_onDuty),
-        IFNULL(CONCAT(attendances.attendance_date," ",attendances.first_offDuty),CONCAT(attendances.attendance_date," ","12:00:00")  )  ) > 4 then
-        
-        TIMESTAMPDIFF(HOUR, CONCAT(attendances.attendance_date," ",attendances.first_onDuty),
-        IFNULL(CONCAT(attendances.attendance_date," ",attendances.first_offDuty),CONCAT(attendances.attendance_date," ","12:00:00")  )  ) -1 ELSE
+        $payroll = Payroll::find($id);
+        $payroll_from_date =  $payroll->payroll_from_date;
+        $payroll_to_date = $payroll->payroll_to_date;
+       //GET FIRST TIME_IN OR FIRST SHIFT IN // IF TIMEDIFF HOURS IS GREATER THAN 4 HOURS THEN LESS 1 HOUR 
+       $firstInTimeDiff = 'TIMESTAMPDIFF(minute, CONCAT(attendances.attendance_date," ",attendances.first_onDuty),
+       IFNULL(CONCAT(attendances.attendance_date," ",attendances.first_offDuty),IFNULL(CONCAT(attendances.attendance_date," ",second_onDuty),CONCAT(attendances.attendance_date," ","12:00:00" ))  )  )/60';
+       $first_in = 'CASE WHEN '.$firstInTimeDiff.' >= 8 then 8 WHEN '.$firstInTimeDiff.' > 4 THEN '.$firstInTimeDiff.' -1 ELSE '.$firstInTimeDiff.'  END';
+       //GET OVERTIME DIFF
+       $overtime_in = 'TIMESTAMPDIFF(minute, CONCAT(attendances.attendance_date," ",attendances.second_onDuty),
+       IFNULL(CONCAT(attendances.attendance_date," ",attendances.second_offDuty),CONCAT(attendances.attendance_date," ",second_offDuty)   )  )/60';
 
-        TIMESTAMPDIFF(HOUR, CONCAT(attendances.attendance_date," ",attendances.first_onDuty),
-        IFNULL(CONCAT(attendances.attendance_date," ",attendances.first_offDuty),CONCAT(attendances.attendance_date," ","12:00:00")  )  ) END
-        ';
-        $overtime_in = 'TIMESTAMPDIFF(HOUR, CONCAT(attendances.attendance_date," ",attendances.second_onDuty),
-        IFNULL(CONCAT(attendances.attendance_date," ",attendances.second_offDuty),CONCAT(attendances.attendance_date," ",second_offDuty)   )  )';
-        $regular_salary_holiday = '(positions.salary_rate *
-        CASE WHEN positions.has_holiday = true then
-        (CASE WHEN attendances.attendance_date = holidays.date THEN holidays.rate ELSE 1 END) ELSE 1 END /8)';
-        $overtime_salary_holiday = '(positions.salary_rate * 
-        CASE WHEN positions.has_holiday = true then
-        (CASE WHEN attendances.attendance_date = holidays.date THEN holidays.ot_rate ELSE 1 END)ELSE 1 END /8)';
-
-        $payrollSummaries = Employee::with('project')->selectRaw('employees.*,positions.salary_rate,positions.position_title,ROUND(SUM('.$first_in.')) AS total_regular_hours,
+       $regular_salary_holiday = '(positions.salary_rate *
+           CASE WHEN positions.has_holiday = true then
+           (CASE WHEN attendances.attendance_date = holidays.date THEN holidays.rate ELSE 1 END) ELSE 1 END /8)';
+       $overtime_salary_holiday = '(positions.salary_rate * 
+           CASE WHEN positions.has_holiday = true then
+           (CASE WHEN attendances.attendance_date = holidays.date THEN holidays.ot_rate ELSE 1 END)ELSE 1 END /8)';
+        $payrollSummaries = Employee::with('project','cashadvances','attendances')->selectRaw('employees.*,positions.salary_rate,positions.position_title,ROUND(SUM('.$first_in.')) AS total_regular_hours,
 
          SUM(ROUND('.$first_in.' *  '.$regular_salary_holiday.'  
          )) AS total_salarypay_with_tax,
          SUM(ROUND(('.$first_in.')  * '.$regular_salary_holiday.' - (('.$first_in.')*(positions.salary_rate))/8       )) AS regularholiday_pay,
+         
          SUM(ROUND(('.$first_in.' )  * (positions.salary_rate * 1 /8) )) AS total_regular_pay,
-
-
          SUM(ROUND( '.$overtime_in.' )) AS total_overtime_hours,
          SUM(ROUND(('.$overtime_in.' )  * '.$overtime_salary_holiday.' )) AS total_overtimepay_with_tax,
          SUM(ROUND(('.$overtime_in.' )  * (positions.salary_rate * 1 /8) )) AS total_overtime_pay,
@@ -294,22 +212,27 @@ class ListPayroll extends Component
          ')
        
          
-        ->whereBetween('attendances.attendance_date',[$this->payroll_from_date,$this->payroll_to_date])
+        ->whereBetween('attendances.attendance_date',[$payroll_from_date,$payroll_to_date])
         ->leftJoin('attendances', 'attendances.biometric_id', '=', 'employees.biometric_id')
         ->leftJoin('holidays', 'holidays.date', '=', 'attendances.attendance_date')
-        // ->leftJoin('cash_advances', 'cash_advances.employee_id', '=', 'employees.id')
         ->leftJoin('positions', 'employees.position_id', '=', 'positions.id')
         ->groupBy('employees.id')
         ->get();
 
 
+        //check if payroll has records
 
-            if($payroll->payroll_status != "printed"){
-
+        
+    // INSERT ALL ROWS IN THE LOOP IN THE PAYROLL_SUMMARY TABLE
+    if($payroll->payroll_status != "approved" && $payroll->payroll_status != null){
 
         foreach($payrollSummaries as $payrollSummary){
+
             $totalRegularHours = $payrollSummary->total_regular_hours;
             $totalOvertime = $payrollSummary->total_overtime_hours;
+            if($totalOvertime == null){
+                $totalOvertime = 0;
+            }
             $totalHolidayPay = $payrollSummary->regularholiday_pay + $payrollSummary->overtimeholiday_pay;
             $payGross = $payrollSummary->total_regular_pay + $payrollSummary->total_overtime_pay + $totalHolidayPay;
             $cashAdvance = $payrollSummary->cashadvances
@@ -319,8 +242,11 @@ class ListPayroll extends Component
             ->sum('cash_amount');
             $totalPay = $payGross - $cashAdvance;
 
+            // insert into payroll_summary table
             PayrollSummary::create([
-                'payroll_id' => $this->selected_id,
+                'payroll_id' => $id,
+                'biometric_id' => $payrollSummary->biometric_id,
+                'employee_id' => $payrollSummary->id,
                 'employee_name' => $payrollSummary->first_name . ' ' . $payrollSummary->middle_name . ' ' . $payrollSummary->last_name,
                 'position_title' => $payrollSummary->position_title,
                 'project_designated' => $payrollSummary->project->project_name,
@@ -334,77 +260,116 @@ class ListPayroll extends Component
                 'total_net_pay' => $totalPay,
             ]);
 
+            //get cashadvance where requested_date where between the payroll date and employees that are in the list
+            //update
+
+           $ca = $payrollSummary->cashadvances->where('status','=','approved')->whereBetween('requested_date',[$payroll_from_date,$payroll_to_date]);
+           foreach($ca as $c){
+               $c->status = "paid";
+               $c->save();
+
+           }
+
+           
+
+         }
+         $attendances = Attendance::has('employees')->where('attendance_status','=','unpaid')->whereBetween('attendance_date',[$payroll_from_date,$payroll_to_date])->get();
+           foreach($attendances as $attendance){
+               $attendance->attendance_status = "paid";
+               $attendance->save();
+
+           }
+         if(!$payroll->approved_by && Auth::user()->role == "superadmin")
+         {
+
+            $payroll->update([
+                'approved_by' => Auth::user()->id,
+                'payroll_status' => 'approved',
+            ]);
+            $this->payroll_status = $payroll->payroll_status;
+            $this->emit('swal:modal', [
+                'icon'  => 'success',
+                'title' => 'Success!!',
+                'text'  => "Payroll successfully approved and now ready to print.",
+            ]);
+         
+         }
+        }// end of if payroll status != printed
+
+        
+
+
+
+      
+
+        }catch(Exception $ex){
+            $this->emit('swal:modal', [
+                'icon'  => 'error',
+                'title' => 'Error!!',
+                'text'  => "Submition for payroll failed {$ex->getMessage()}",
+            ]);
         }
 
-        if ($this->selected_id) {
-            $payroll->update([
-                'payroll_status' => 'printed',
-            ]);
-    
-          
-          
-    
-        $this->emit('swal:modal', [
-            'icon'  => 'success',
-            'title' => 'Success!!',
-            'text'  => "Payroll successfully created.",
-        ]);
+    }
 
-        // $projects = Project::join('project_images','projects.id','=','project_images.project_id');
-        view()->share('payrollSummaries',$payrollSummaries);
+    public function bulkPayslipPDF($id)
+    {   
+        // $payroll_to_date = Carbon::parse($this->payroll_to_date)->format('F d, Y');
+        // $payroll_from_date = Carbon::parse($this->payroll_from_date)->format('F d, Y');
+        $payrolls = Payroll::find($id);
+        if($payrolls->payroll_status != "pending"){
+
+        try {
+        $printedPayrolls = PayrollSummary::where('payroll_id',$id)->get();
+
+           
+        $this->payroll_from_date = $payrolls->payroll_from_date;
+        $this->payroll_to_date = $payrolls->payroll_to_date;
+    
+        $holidays = Holiday::where('date','>=',$this->payroll_from_date)->where('date','<=',$this->payroll_to_date)->count();
+      
+        view()->share('printedPayrolls',$printedPayrolls);
         
-        $pdf = PDF::loadView('livewire.admin.payroll.all-payslip', compact('payrollSummaries','payroll_from_date','payroll_to_date','holidays'))->setPaper('a4')
+        $pdf = PDF::loadView('livewire.admin.payroll.all-payslip', compact('printedPayrolls','payrolls','holidays'))->setPaper('a4')
         ->setOption('margin-left','15')
                         ->setOption('margin-right','15')
                         ->setOption('margin-top','10')
                         ->setOption('margin-bottom','20')
                         ->setOption('footer-center','')
                         ->setOption('footer-left','');
-    //    $pdf->setOption('header-html', view('pdf.pdf-header'));
-        return $pdf->stream('payslip.pdf');
-      
-        }//end of foreach
-    }// end of if payroll status != printed
+        $payrolls->update([
+            'payroll_status' => 'printed',
+        ]);
+       
+    // session()->flash('message','Order deleted successfully!');
+  
+        $this->emit('swal:modal', [
+            'icon'  => 'success',
+            'title' => 'Success!!',
+            'text'  => "Payroll successfully created.",
+        ],
+        );
+
+    return $pdf->stream('payslip.pdf') ;
+
 
         }catch(Exception $ex){
             $this->emit('swal:modal', [
                 'icon'  => 'error',
                 'title' => 'Error!!',
-                'text'  => "Submition for payroll failed",
+                'text'  => "Printing payroll failed {$ex->getMessage()}",
             ]);
         }
-    }
 
+       
 
-    public function approved($id) {
-
-        
-        // $this->validate([
-        //     'payroll_from_date' => 'required|date',
-        //     'payroll_to_date' => 'required|date',      
-        //     'payroll_description' => 'required',
-           
-        // ]); 
-        
-        $payroll = Payroll::find($id);
-        if(!$payroll->approved_by && Auth::user()->role == "superadmin"){
-
-        $payroll->update([
-            'approved_by' => Auth::user()->id,
-            'payroll_status' => "approved",
-        ]);
-
-
+    } else {
         $this->emit('swal:modal', [
-            'icon'  => 'success',
-            'title' => 'Success!!',
-            'text'  => "Payroll with title: {$payroll->payroll_description} successfully approved!",
+            'icon'  => 'error',
+            'title' => 'Error!!',
+            'text'  => "Approval for this payroll is needed.",
         ]);
-        $this->resetInputFields();
-        }
-
     }
 
-
-    
+    }  
 }

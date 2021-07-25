@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddUserRoleInUsersTable extends Migration
+class AddProjectIdToPayrollsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,9 @@ class AddUserRoleInUsersTable extends Migration
      */
     public function up()
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->string('role');
+        Schema::table('payrolls', function (Blueprint $table) {
+            $table->unsignedBigInteger('project_id')->nullable();
+            // $table->foreign('project_id')->references('id')->on('projects')->onUpdate('cascade')->onDelete('cascade');
         });
     }
 
@@ -25,7 +26,7 @@ class AddUserRoleInUsersTable extends Migration
      */
     public function down()
     {
-        Schema::table('users', function (Blueprint $table) {
+        Schema::table('payrolls', function (Blueprint $table) {
             //
         });
     }

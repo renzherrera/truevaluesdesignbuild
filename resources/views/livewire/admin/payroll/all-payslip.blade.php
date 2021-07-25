@@ -65,20 +65,20 @@
         }
 </style>
 
-    @foreach ($payrollSummaries as $payrollSummary)
+    @foreach ($printedPayrolls as $payrollSummary)
     @php
-        $perHour = $payrollSummary->salary_rate/8;
-        $totalRegularHours = $payrollSummary->total_regular_hours;
-        $totalOvertime = $payrollSummary->total_overtime_hours;
-        $totalHours =  $totalRegularHours + $totalOvertime;
-        $totalHolidayPay = $payrollSummary->regularholiday_pay + $payrollSummary->overtimeholiday_pay;
-        $payGross = $payrollSummary->total_regular_pay + $payrollSummary->total_overtime_pay + $totalHolidayPay;
-        $cashAdvance = $payrollSummary->cashadvances
-                                      ->where('requested_date','>=',$payroll_from_date)
-                                      ->where('requested_date','<=', $payroll_to_date)
-                                      ->where('status','!=','paid')
-                                      ->sum('cash_amount');
-        $totalPay = $payGross - $cashAdvance;
+        // $perHour = $payrollSummary->salary_rate/8;
+        // $totalRegularHours = $payrollSummary->total_regular_hours;
+        // $totalOvertime = $payrollSummary->total_overtime_hours;
+        // $totalHours =  $totalRegularHours + $totalOvertime;
+        // $totalHolidayPay = $payrollSummary->regularholiday_pay + $payrollSummary->overtimeholiday_pay;
+        // $payGross = $payrollSummary->total_regular_pay + $payrollSummary->total_overtime_pay + $totalHolidayPay;
+        // $cashAdvance = $payrollSummary->cashadvances
+        //                               ->where('requested_date','>=',$payroll_from_date)
+        //                               ->where('requested_date','<=', $payroll_to_date)
+        //                               ->where('status','!=','paid')
+        //                               ->sum('cash_amount');
+        // $totalPay = $payGross - $cashAdvance;
 
     @endphp
         <div class="container-fluid mb-3" style="width: 100%; text-align:center">
@@ -86,7 +86,7 @@
                 <div class="col-md-12 " >
                 <img  src="{{public_path('storage/images/TV.png')}}" width="40%" alt="">
                 <h5 class="text-center" style="letter-spacing: 2px;"><strong>PAYSLIP</strong></h5>
-                <h6>{{Carbon\Carbon::parse($payroll_from_date)->format('F d, Y').' - '.Carbon\Carbon::parse($payroll_to_date)->format('F d, Y');}}</h6>
+                <h6>{{Carbon\Carbon::parse($payrolls->payroll_from_date)->format('F d, Y').' - '.Carbon\Carbon::parse($payrolls->payroll_to_date)->format('F d, Y');}}</h6>
 
                 </div>
             </div>
@@ -94,19 +94,20 @@
             <div style="width:50%;float: left;">
                
                 <h6 style="text-align: left" class="mb-2" >
-                    <strong>Employee Name: </strong>{{$payrollSummary->first_name . ' ' . $payrollSummary->middle_name . ' ' . $payrollSummary->last_name}}
+                    <strong>Employee Name: </strong>{{$payrollSummary->employee_name}}
                 </h6>
                 <h6 style="text-align: left" class="mb-2" >
                     <strong>Position: </strong>{{$payrollSummary->position_title}}
                 </h6>
                 <h6 style="text-align: left" class="mb-4" >
-                    <strong>Work Designated: </strong> {{$payrollSummary->project->project_name}}
+                    <strong>Work Designated: </strong> {{$payrollSummary->project_designated}}
                 </h6> 
                 
             </div>
             <div  style="width:50%; float: right; text-align: right;">
                 <h6 style="text-align: right" class="mb-2" >
-                    <strong>Total Working Hours: </strong> {{$totalHours}}
+                    <strong>Total Working Hours: </strong> 
+                    {{$payrollSummary->total_hours_regular + $payrollSummary->total_hours_overtime}}
 
                 </h6> 
                 <h6 style="text-align: right" class="mb-2" >
@@ -115,7 +116,7 @@
                 </h6> 
                 <h6 style="text-align: right" class="mb-4" >
                     <strong>Schedule: </strong> 
-                    {{Carbon\Carbon::parse($payrollSummary->schedule->start_time)->format('g:i A'). ' - '.  Carbon\Carbon::parse($payrollSummary->schedule->end_time)->format('g:i A')}}
+                    {{$payrollSummary->schedule}}
                 </h6> 
             </div>
             </div>
@@ -136,24 +137,25 @@
             <tbody>
                 <tr>
                     <td>Regular Hours</td>
-                    <td>{{$totalRegularHours}}</td>
+                    <td>{{$payrollSummary->total_hours_regular}}</td>
                     <td>&#8369; {{number_format($payrollSummary->salary_rate/8,2)}}</td>
-                    <td>&#8369; {{number_format($payrollSummary->total_regular_pay,2)}}</td>
+                    <td>&#8369; {{number_format(($payrollSummary->salary_rate * $payrollSummary->total_hours_regular)/8,2)}}</td>
 
 
                 </tr>
                 <tr>
                     <td>Overtime Hours</td>
-                    <td>{{$totalOvertime}}</td>
+                    <td>{{$payrollSummary->total_hours_overtime}}</td>
                     <td>&#8369; {{number_format($payrollSummary->salary_rate/8,2)}}</td>
-                    <td>&#8369; {{number_format($payrollSummary->total_overtime_pay,2)}}</td>
+                    <td>&#8369; {{number_format(($payrollSummary->salary_rate * $payrollSummary->total_hours_overtime)/8,2)}}</td>
+
                 </tr>
-                @if ($holidays > 0 && $payrollSummary->position->has_holiday)
+                @if ($holidays > 0 && $payrollSummary->total_holidaypay)
                 <tr>
                     <td>Holiday Pay</td>
                     <td></td>
                     <td></td>
-                    <td>&#8369; {{number_format($totalHolidayPay,2)}}</td>
+                    <td>&#8369; {{number_format($payrollSummary->total_holidaypay,2)}}</td>
                 </tr>
                 @endif
 
@@ -161,7 +163,7 @@
                 <th style="width: 100%;"></th>
                 <th></th>
                 <th>Salary Gross: </th>
-                <th style="width: 20%;">&#8369; {{number_format($payGross,2) }}</th>
+                <th style="width: 20%;">&#8369; {{number_format($payrollSummary->salary_gross,2) }}</th>
                 </tr>
             </tfoot>
             <thead>
@@ -176,7 +178,7 @@
                 <td>Salary Advance</td>
                 <td></td>
                 <td></td>
-                <td class="text-danger">-&#8369; {{number_format($cashAdvance,2)}}</td>
+                <td class="text-danger">-&#8369; {{number_format($payrollSummary->cash_advance,2)}}</td>
             </tr>
             {{-- <tfoot>
                 <th style="width: 100%;"></th>
@@ -189,7 +191,7 @@
                 <th style="width: 100%;"></th>
                 <th ></th>
                 <th><h5><strong>Total Salary Net: </strong></h5></th>
-                <th style="width: 20%;" class="text-lg"><h5><strong>&#8369; {{number_format($totalPay,2)}}</strong></h5></th>
+                <th style="width: 20%;" class="text-lg"><h5><strong>&#8369; {{number_format($payrollSummary->total_net_pay,2)}}</strong></h5></th>
                 </tr>
             </tfoot>
             

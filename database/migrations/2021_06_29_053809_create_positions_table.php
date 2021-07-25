@@ -18,6 +18,7 @@ class CreatePositionsTable extends Migration
             $table->string('position_title');
             $table->longText('job_description');
             $table->decimal('salary_rate',12, 2);
+            $table->boolean('has_holiday');
             $table->timestamps();
         });
     }

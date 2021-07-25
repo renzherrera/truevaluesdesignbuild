@@ -18,7 +18,6 @@
     </head>
     
        
-        <div class="app-main__inner">
             
             <div class="app-page-title">
                 @if($listMode)
@@ -147,7 +146,7 @@
                                     </thead>
                                     <tbody>
                                         @if($projects->count() < 1)
-                                            <tr><td colspan="6" class="text-center"><h4>No projects found</h4></td></tr>
+                                            <tr><td colspan="100%" class="text-center"><h4>No projects found</h4></td></tr>
                                         
                                         @endif
                                         @foreach ($projects as $project)
@@ -226,7 +225,6 @@
         
                 </div>
                 
-            </div>
 
 
 

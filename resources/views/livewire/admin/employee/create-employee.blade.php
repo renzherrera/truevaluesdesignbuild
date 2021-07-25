@@ -1,4 +1,5 @@
 <div>
+    <title>New Employee</title>
     <style>
         .selectpicker{
             font-size: 0.9rem;

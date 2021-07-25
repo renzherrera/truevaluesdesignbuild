@@ -1,7 +1,9 @@
 <div>
 @include('livewire.admin.employee.webcam-modal')
-
-<title>New Employee | True Values</title>
+@if (!$createMode)
+<title>List of Employees | True Values</title>
+    
+@endif
 <style>
      <style>
         nav svg{
@@ -20,7 +22,6 @@
 </head>
 <div>
    
-    <div class="app-main__inner">
         <div class="app-page-title">
             <div class="page-title-wrapper">
                 <div class="page-title-heading">
@@ -88,7 +89,7 @@
                                                     <div tabindex="-1" role="menu" aria-hidden="true" class="dropdown-menu" x-placement="bottom-start" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(-7px, 33px, 0px);">
                                                         <button type="button" tabindex="0" class="dropdown-item" wire:click="createPDF()">PDF</button>
                                                         <button type="button" tabindex="0" class="dropdown-item">Excel</button>
-                                                        <button type="button" tabindex="0" class="dropdown-item" wire:click.prevent="import">Import Excel</button>
+                                                        {{-- <button type="button" tabindex="0" class="dropdown-item" wire:click.prevent="import">Import Excel</button> --}}
                                                       
                                                     </div>
                                                 </div>
@@ -159,16 +160,24 @@
                                         overflow: hidden;
                                         border-radius: 50%;
                                         display: block; text-align:center; "  >
+                                        @if ($employee->image)
                                             <a href="#" class="flex-center" data-toggle="tooltip" >
                                               <img style=" width: 42px;
                                               height: auto; margin:auto;"  alt="Image placeholder" src="{{ asset("storage/employee_images/". $employee->image)}}">
                                            </a>
+                                        @else
+                                        <a href="#" class="flex-center" data-toggle="tooltip" >
+                                            <img style=" width: 42px;
+                                            height: auto; margin:auto;"  alt="Image placeholder" src="{{ asset("storage/images/user_100px.png")}}">
+                                         </a>
+                                        @endif
+
                                           </div>
 
                                        </td>
                                         <td>
                                             <div class="media-body flex items-center">
-                                                <h2 class="name mb-0 text-sm">{{$employee->first_name .' '. $employee->middle_name.' '. $employee->last_name}}</h2>
+                                                <h2 class="name mb-0 text-sm"><strong>{{$employee->first_name .' '. $employee->middle_name.' '. $employee->last_name}}</strong></h2>
                                                 <p class="text-xs mb-0">{{$employee->position->position_title}}</p>
 
                                             </div>
@@ -176,8 +185,9 @@
                                         <td>{{$employee->contact}}</td>
                                         <td>{{$employee->date_of_birth}}</td>
                                         <td>{{ucwords($employee->gender)}}</td>
+                                       
                                         <td><span>&#8369; </span>{{number_format($employee->position->salary_rate,2)}}</td>
-                                        <td>{{$employee->schedule->start_time .' - '. $employee->schedule->end_time }}</td>
+                                        <td>{{ Carbon\Carbon::parse($employee->schedule->start_time)->format('g:i:A').' - '. Carbon\Carbon::parse($employee->schedule->end_time)->format('g:i:A')}}</td>
                                         <td>{{$employee->address}}</td>
                                         {{-- <td><span>&#8369; </span>{{number_format($project->estimated_budget,2)}}</td> --}}
                                         @if($employee->project)
@@ -224,7 +234,6 @@
     
                 </div>
     
-            </div>
             
 
         @endif

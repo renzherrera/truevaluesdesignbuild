@@ -19,6 +19,8 @@ class CreateCashAdvancesTable extends Migration
             $table->decimal('cash_amount',12,2);
             $table->string('status');
             $table->date('requested_date');
+            $table->unsignedBigInteger('approved_by')->index()->nullable();
+            $table->foreign('approved_by')->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');
             $table->timestamps();
         });
     }

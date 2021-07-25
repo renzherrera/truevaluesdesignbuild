@@ -16,6 +16,7 @@ class Attendance extends Model
         'first_offDuty',
         'second_onDuty',
         'second_offDuty',
+        'attendance_status',
     ];
 
     public function employees() {

@@ -11,6 +11,8 @@ class PayrollSummary extends Model
     protected $table = "payroll_summary";
     protected $fillable = [
         'payroll_id',
+        'employee_id',
+        'biometric_id',
         'employee_name',
         'position_title',
         'project_designated',
@@ -23,4 +25,15 @@ class PayrollSummary extends Model
         'cash_advance',
         'total_net_pay',
     ];
+    public function user() {
+        return $this->belongsTo(User::class);
+    }
+
+    public function employees() {
+        return $this->belongsTo(Employee::class);
+    }
+
+    public function payrolls() {
+        return $this->belongsTo(Payroll::class,'payroll_id','id');
+    }
 }

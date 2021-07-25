@@ -77,8 +77,6 @@
                 </li>
 
                 <li>
-                    <li class="app-sidebar__heading"></li>
-                <li>
                     <a href="#">
                         <i class="metismenu-icon pe-7s-diamond"></i>
                         Categories
@@ -96,7 +94,6 @@
                         </li>
                         <li>
                             <a href="{{route('admin.list-schedule')}}">
-                                {{-- <i class="pe-7s-users"></i> --}}
                                 Schedule
                             </a>
                         </li>
@@ -123,88 +120,37 @@
                    </li>
                     </ul>
                 </li>
-                {{-- <li>
+
+                <li>
                     <a href="#">
-                        <i class="metismenu-icon pe-7s-car"></i>
-                        Components
+                        <i class="metismenu-icon pe-7s-users"></i>
+                        Users
                         <i class="metismenu-state-icon pe-7s-angle-down caret-left"></i>
                     </a>
                     <ul>
+                        
                         <li>
-                            <a href="components-tabs.html">
+                            <a href="{{route('admin.list-users')}}">
                                 <i class="metismenu-icon">
-                                </i>Tabs
+                                </i>List of Users
                             </a>
                         </li>
                         <li>
-                            <a href="components-accordions.html">
+                            <a href="{{route('admin.list-users.register')}}">
                                 <i class="metismenu-icon">
-                                </i>Accordions
-                            </a>
-                        </li>
-                        <li>
-                            <a href="components-notifications.html">
-                                <i class="metismenu-icon">
-                                </i>Notifications
-                            </a>
-                        </li>
-                        <li>
-                            <a href="components-modals.html">
-                                <i class="metismenu-icon">
-                                </i>Modals
-                            </a>
-                        </li>
-                        <li>
-                            <a href="components-progress-bar.html">
-                                <i class="metismenu-icon">
-                                </i>Progress Bar
-                            </a>
-                        </li>
-                        <li>
-                            <a href="components-tooltips-popovers.html">
-                                <i class="metismenu-icon">
-                                </i>Tooltips &amp; Popovers
-                            </a>
-                        </li>
-                        <li>
-                            <a href="components-carousel.html">
-                                <i class="metismenu-icon">
-                                </i>Carousel
-                            </a>
-                        </li>
-                        <li>
-                            <a href="components-calendar.html">
-                                <i class="metismenu-icon">
-                                </i>Calendar
-                            </a>
-                        </li>
-                        <li>
-                            <a href="components-pagination.html">
-                                <i class="metismenu-icon">
-                                </i>Pagination
-                            </a>
-                        </li>
-                        <li>
-                            <a href="components-scrollable-elements.html">
-                                <i class="metismenu-icon">
-                                </i>Scrollable
-                            </a>
-                        </li>
-                        <li>
-                            <a href="components-maps.html">
-                                <i class="metismenu-icon">
-                                </i>Maps
+                                </i>New User
                             </a>
                         </li>
                     </ul>
                 </li>
-                <li  >
-                    <a href="tables-regular.html">
-                        <i class="metismenu-icon pe-7s-display2"></i>
-                        Tables
+
+                <li>
+                    <a href="{{route('admin.company-profile')}}">
+                        <i class="metismenu-icon pe-7s-global"></i>
+                        Company Profile
                     </a>
                 </li>
-                 --}}
+
             </ul>
         </div>
     </div>

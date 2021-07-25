@@ -38,11 +38,11 @@ class ListProject extends Component
     {
         $this->validate([
             'project_name' => 'required',
-            'project_owner' => 'required',      
+            // 'project_owner' => 'required',      
             // 'project_type' => 'required',
-            'project_location' => 'required',
+            // 'project_location' => 'required',
             'project_status' => 'required',
-            'project_description' => 'required',
+            // 'project_description' => 'required',
         ]); 
         $project = Project::create([
             'project_name' => $this->project_name,
@@ -133,10 +133,10 @@ class ListProject extends Component
     public function update() {
         $this->validate([
             'project_name' => 'required',
-            'project_owner' => 'required',      
-            'project_location' => 'required',
+            // 'project_owner' => 'required',      
+            // 'project_location' => 'required',
             'project_status' => 'required',
-            'project_description' => 'required',
+            // 'project_description' => 'required',
         ]); 
     if ($this->selected_id) {
         $project = Project::find($this->selected_id);

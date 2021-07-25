@@ -21,6 +21,7 @@ class CreateAttendancesTable extends Migration
             $table->time('first_offDuty')->nullable()->default(null);
             $table->time('second_onDuty')->nullable()->default(null);
             $table->time('second_offDuty')->nullable()->default(null);
+            $table->string('attendance_status')->default('unpaid');
             $table->timestamps();
         });
     }

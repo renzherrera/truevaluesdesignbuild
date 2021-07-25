@@ -1,6 +1,12 @@
 <div class="app-header header-shadow">
             <div class="app-header__logo ">
-                <div class="mr-3" > <img class="logo" src="{{asset('storage/images/TV.png')}}" width="100%" alt=""></div>
+                @if ($company)
+                <div class="mr-3" > <img class="logo" src="{{asset('storage/images/'. $company->image)}}" width="100%" alt=""></div>
+                @else
+                <div class="m-5" > <h2><strong>truevalue.</strong></h2></div>
+
+                @endif
+
                 <div class="header__pane ">
                     <div>
                         <button type="button" class="hamburger close-sidebar-btn hamburger--elastic" data-class="closed-sidebar">
@@ -39,16 +45,24 @@
                                 <div class="widget-content-left">
                                     <div class="btn-group">
                                         <a data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="p-0 btn">
-                                            <img width="42" class="rounded-circle" src="{{asset('assets/images/avatars/1.jpg')}}" alt="">
+                                            @if (Auth::user()->image)
+                                            <img width="42" class="rounded-circle" src="{{asset('storage/user_images/'. Auth::user()->image)}}" alt="">
                                             <i class="fa fa-angle-down ml-2 opacity-8"></i>
+                                            @else
+                                            <img width="42" class="rounded-circle" src="{{asset('storage/images/user_100px.png')}}" alt="">
+                                            <i class="fa fa-angle-down ml-2 opacity-8"></i>
+                                            @endif
+
                                         </a>
                                         <div tabindex="-1" role="menu" aria-hidden="true" class="dropdown-menu dropdown-menu-right">
                                             <button type="button" tabindex="0" class="dropdown-item">User Account</button>
-                                            <button type="button" tabindex="0" class="dropdown-item">Settings</button>
-                                            <h6 tabindex="-1" class="dropdown-header">Header</h6>
-                                            <button type="button" tabindex="0" class="dropdown-item">Actions</button>
                                             <div tabindex="-1" class="dropdown-divider"></div>
-                                            <button type="button" tabindex="0" class="dropdown-item">Dividers</button>
+                                            <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault();  document.getElementById('logout-form').submit();">
+                                                 {{ __('Logout') }}
+                                              </a>
+                                              <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                                                @csrf
+                                              </form>
                                         </div>
                                     </div>
                                 </div>
