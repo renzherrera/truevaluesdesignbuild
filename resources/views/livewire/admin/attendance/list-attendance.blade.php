@@ -73,10 +73,10 @@
                             <div class="widget-content-wrapper text-white">
                                 <div class="widget-content-left">
                                     <div class="widget-heading">Early Out</div>
-                                    <div class="widget-subheading">People Interested</div>
+                                    <div class="widget-subheading">Incompete working hours w/ Early Out</div>
                                 </div>
                                 <div class="widget-content-right">
-                                    <div class="widget-numbers text-white"><span>46%</span></div>
+                                    <div class="widget-numbers text-white"><span>{{$earlyOutCounts}}</span></div>
                                 </div>
                             </div>
                         </div>
@@ -85,11 +85,11 @@
                         <div class="card mb-3 widget-content bg-premium-dark">
                             <div class="widget-content-wrapper text-white">
                                 <div class="widget-content-left">
-                                    <div class="widget-heading">Unenrolled Attendances</div>
-                                    <div class="widget-subheading">Revenue streams</div>
+                                    <div class="widget-heading">Unenrolled Id</div>
+                                    <div class="widget-subheading">no. of Attendances[Unenrolled]: <strong>{{$unenrolledAttendance}}</strong></div>
                                 </div>
                                 <div class="widget-content-right">
-                                    <div class="widget-numbers text-warning"><span>{{$unenrolledAttendance}}</span></div>
+                                    <div class="widget-numbers text-warning"><span>{{$unenrolledId}}</span></div>
                                 </div>
                             </div>
                         </div>
@@ -109,12 +109,18 @@
             <div class="tab-content">
                 <div class="tab-pane tabs-animation fade show active" id="tab-content-0" role="tabpanel">
                     <h5>List of Attendances    </h5>
+                    
                     <div class="dropdown ">
+                        <div class="btn btn-dark float-left d-flex mr-3" style="cursor: pointer;" data-toggle="modal" data-target="#attendance_modal"> 
+                            <i class="pe-7s-plus text-white pr-3"  style="font-size: 19px!important; ">
+                            </i>
+                            <span style="vertical-align: baseline; margin:auto; font-size:13px; padding-right:25px;">Add Record</span>
+                        </div>
                         <button type="button" aria-haspopup="true" aria-expanded="true" data-toggle="dropdown" class="mb-2 mr-2  dropdown-toggle btn btn-outline-alternate">Import / Export</button>
                         <div tabindex="-1" role="menu" aria-hidden="true" class="dropdown-menu" x-placement="bottom-start" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(-7px, 33px, 0px);">
                             <button type="button" tabindex="0" class="dropdown-item" wire:click="createPDF()">Download PDF</button>
                             <button type="button" tabindex="0" class="dropdown-item">Download Excel</button>
-                            <button type="button" tabindex="0" class="dropdown-item"data-toggle="modal" data-target="#exampleModal">Import Excel/CSV</button>
+                            <button type="button" tabindex="0" class="dropdown-item"data-toggle="modal" data-target="#importModal">Import Excel/CSV</button>
                           
                         </div>
                     </div>
@@ -269,13 +275,12 @@
                                                 @endif
                                             </td>
 
-
                                             <td class="text-center"><div class="dropdown">
                                                 <button type="button" aria-haspopup="true" aria-expanded="false" data-toggle="dropdown" class=" btn btn-outline-link hover"> <i class="metismenu-icon pe-7s-config"></i></button>
                                                 <div tabindex="-1" role="menu" aria-hidden="true" class="dropdown-menu" x-placement="bottom-start" style="z-index: 999999;position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(0px, 33px, 0px);">
                                                     <h6 tabindex="-1" class="dropdown-header">Actions</h6>
-                                                        <button wire:click="edit({{$attendance->id}})" tabindex="0" class="dropdown-item">Edit</button>
-                                                    <button wire:click.prevent="$emit('deleteAttendance',{{$attendance->id}})" class="dropdown-item" type="button"> Delete</button>
+                                                        <button wire:click.prevent="edit({{$attendance->attendance_id}})" data-toggle="modal" data-target='#attendance_modal' type="button" class="dropdown-item">Edit</button>
+                                                    <button wire:click.prevent="$emit('deleteAttendances',{{$attendance->attendance_id}})" class="dropdown-item" type="button"> Delete</button>
                                                 </div>
                                             </div></td>
                                         </tr>    
@@ -300,58 +305,11 @@
                     </div>
         
                 </div>
-                
-
-            <style>
-                .modal-backdrop {
-                    /* bug fix - no overlay */    
-                    display: none;    
-                }
-                .modal {
-                    top:20%;
-        
-                }
-            </style>
-            <div class="modal fade bd-example-modal-sm" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" wire:ignore.self>
-                <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalLabel">Import</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <div class="modal-body">
-                            <div class="alert alert-warning mt-2 mb-2 fade show" role="alert">
-                                <h4 class="alert-heading">Reminder!</h4>
-                                <p class="mb-0 ">Before you import, be sure to change the date format on your excel sheet #4 (Exception Statistic Report). <br> <br> 
-                                    Click <a href="{{asset('assets/howToChangeDateFormat.pdf')}}" download>here</a> to download tutorial pdf <small>(How to change date format)</small> .</p>
-                                <br>
-                                
-                            </div>
-                            <hr>
-                           
-                            <div class="form-group">
-                                <label for="importExcelFile">Import Excel / CSV File</label><br>
-                                <label for="importExcelFile" class="btn btn-outline-alternate">Browse Files</label><br>
-                                <p> {{$importExcelFile}}</p>
-                                <input hidden type="file" name="importExcelFile" id="importExcelFile" wire:model.defer="importExcelFile" accept=".xlsx, .xls, .csv" required> <br>
-                                @error('importExcelFile') <span class="text-danger">You have to browse/choose a valid file.</span> @enderror
-                                
-                            </div>
-                  
-        
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                            <div wire:loading.remove>
-                            <button type="button" class="btn btn-alternate" wire:click.prevent="import()" >Import to Database</button>
-
-                            </div>
-                        </div>
-                    </div>
-            </div>
-        </div>
+            @include('livewire.admin.attendance.create-modal')
+            @include('livewire.admin.attendance.import-modal')
+            <script>
+               window.livewire.on('toggleAttendanceModal', () => $('#attendance_modal').modal('toggle'));
+                </script>
         <script type="text/javascript">
 
             $(function() {
@@ -425,7 +383,7 @@
             </script>    
         <script>
             document.addEventListener('livewire:load', function () {
-                @this.on('deleteAttendance', id => {
+                @this.on('deleteAttendances', id => {
                     Swal.fire({
                     title: 'Are you sure?',
                     text: "You won't be able to revert this!",
@@ -452,7 +410,7 @@
             })
         </script>
         
-    
+        
         
 </div>
    
