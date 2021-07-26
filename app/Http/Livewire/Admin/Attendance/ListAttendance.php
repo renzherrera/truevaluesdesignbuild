@@ -8,6 +8,7 @@ use App\Models\Employee;
 use App\Models\Project;
 use Carbon\Carbon;
 use Exception;
+use Illuminate\Database\Eloquent\Builder;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Maatwebsite\Excel\Facades\Excel;
@@ -18,7 +19,7 @@ class ListAttendance extends Component
     use WithPagination;
     use WithFileUploads;
     public $importExcelFile,$selected_id, $biometric_id, $attendance_date, $first_onDuty,$first_offDuty=null,$second_onDuty=null,$second_offDuty=null,
-            $createMode = true, $updateMode= false,$noTimeOutRecords,$start = null,$end = null, $searchTerm,$project_id,$lateCounts;
+            $createMode = true, $updateMode= false, $noTimeOutRecords, $start = null, $end = null, $searchTerm, $project_id, $lateCounts, $unenrolledAttendance;
     public function render()
     {
         $searchTerm = $this->searchTerm;
@@ -32,37 +33,42 @@ class ListAttendance extends Component
         //get projects
         $projects = Project::select('id','project_name')->get();
     
-        //search query only if input box filled
+        $unenrolledAttendance = Attendance::doesntHave('employees')->count();
+        $this->unenrolledAttendance = $unenrolledAttendance;
 
         //NOTIME OUT RECORDS
-        $noTimeOutRecords = Attendance::has('employees');
+        
+        $noTimeOutRecords = Attendance::has('employees')
+        ->where(function ($q) use ($searchTerm) {
+            return $q->where('employees.biometric_id', '=',  $searchTerm )
+            ->orWhere('employees.first_name', 'LIKE', '%' . $searchTerm . '%')
+            ->orWhere('employees.middle_name', 'LIKE', '%' . $searchTerm . '%')
+            ->orWhere('employees.last_name', 'LIKE', '%' . $searchTerm . '%');
+        })
+        ->where('second_onDuty',null)->where('first_offDuty',null);
 
-        //count late counts
-        $lateCounts = Attendance::has('employees')->whereRaw('attendances.first_onDuty > schedules.start_time');
+     
+        //late counts
+        $lateCounts = Attendance::has('employees')->
+        where(function ($q) use ($searchTerm) {
+            return $q->where('employees.biometric_id', '=',  $searchTerm )
+            ->orWhere('employees.first_name', 'LIKE', '%' . $searchTerm . '%')
+            ->orWhere('employees.middle_name', 'LIKE', '%' . $searchTerm . '%')
+            ->orWhere('employees.last_name', 'LIKE', '%' . $searchTerm . '%');
+        })
+        ->whereColumn('attendances.first_onDuty','>', 'schedules.start_time');
        
         
         //get all attendance
-        $attendances = Attendance::has('employees')->orderBy('attendance_date','desc')->orderBy('first_onDuty','asc');
+        $attendances = Attendance::has('employees')->orderBy('attendance_date','desc')->orderBy('first_onDuty','asc')
+        ->where(function ($q) use ($searchTerm) {
+            return $q->where('employees.biometric_id', '=',  $searchTerm )
+            ->orWhere('employees.first_name', 'LIKE', '%' . $searchTerm . '%')
+            ->orWhere('employees.middle_name', 'LIKE', '%' . $searchTerm . '%')
+            ->orWhere('employees.last_name', 'LIKE', '%' . $searchTerm . '%');
+        });
 
-        if($searchTerm){
-            $attendances = $attendances
-            ->where('employees.first_name', 'LIKE', "%{$searchTerm}%")
-            // ->orWhere('employees.id', '=', "{$searchTerm}")
-            ->orWhere('employees.middle_name', 'LIKE', "%{$searchTerm}%")
-            ->orWhere('employees.last_name', 'LIKE', "%{$searchTerm}%");
-
-            $lateCounts = $lateCounts->orWhere('employees.first_name', 'LIKE', "%{$searchTerm}%")
-            // ->orWhere('employees.id', '=', "{$searchTerm}")
-            ->orWhere('employees.middle_name', 'LIKE', "%{$searchTerm}%")
-            ->orWhere('employees.last_name', 'LIKE', "%{$searchTerm}%");
-            
-            $noTimeOutRecords = $noTimeOutRecords->where('employees.first_name', 'LIKE', "%{$searchTerm}%")
-            // ->orWhere('employees.id', '=', "{$searchTerm}")
-            ->orWhere('employees.middle_name', 'LIKE', "%{$searchTerm}%")
-            ->orWhere('employees.last_name', 'LIKE', "%{$searchTerm}%");
-
-
-            }
+       
 
         if($this->project_id){
             $attendances = $attendances->where('employees.project_id',$this->project_id);
@@ -79,7 +85,6 @@ class ListAttendance extends Component
       
         //results finalizing
         $noTimeOutRecords = $noTimeOutRecords
-        ->where('second_onDuty',null)->where('first_offDuty',null)
         ->join('employees', 'attendances.biometric_id', '=', 'employees.biometric_id')
         ->join('schedules', 'schedules.id', '=', 'employees.schedule_id')
         ->count();

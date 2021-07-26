@@ -89,7 +89,7 @@
                                     <div class="widget-subheading">Revenue streams</div>
                                 </div>
                                 <div class="widget-content-right">
-                                    <div class="widget-numbers text-warning"><span>$14M</span></div>
+                                    <div class="widget-numbers text-warning"><span>{{$unenrolledAttendance}}</span></div>
                                 </div>
                             </div>
                         </div>
@@ -141,7 +141,7 @@
 
                                                             
                                                             {{-- <label for=""><small>Filter</small></label> --}}
-                                                          <select wire:model= "project_id" class="form-control text-center" style="height: 33px; font-size: 14px; margin-top: -5px;">
+                                                          <select wire:model= "project_id" class="form-control text-center " style="height: 33px; font-size: 14px; margin-top: -5px;cursor:pointer;">
                                                               <option value="" >All</option>
                                                               @foreach ($projects as $project)
                                                               <option value="{{$project->id}}" >{{$project->project_name}}</option>
@@ -271,7 +271,7 @@
 
 
                                             <td class="text-center"><div class="dropdown">
-                                                <button type="button" aria-haspopup="true" aria-expanded="false" data-toggle="dropdown" class="dropdown-toggle btn btn-outline-link"></button>
+                                                <button type="button" aria-haspopup="true" aria-expanded="false" data-toggle="dropdown" class=" btn btn-outline-link hover"> <i class="metismenu-icon pe-7s-config"></i></button>
                                                 <div tabindex="-1" role="menu" aria-hidden="true" class="dropdown-menu" x-placement="bottom-start" style="z-index: 999999;position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(0px, 33px, 0px);">
                                                     <h6 tabindex="-1" class="dropdown-header">Actions</h6>
                                                         <button wire:click="edit({{$attendance->id}})" tabindex="0" class="dropdown-item">Edit</button>
