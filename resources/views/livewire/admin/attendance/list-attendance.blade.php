@@ -118,8 +118,8 @@
                         </div>
                         <button type="button" aria-haspopup="true" aria-expanded="true" data-toggle="dropdown" class="mb-2 mr-2  dropdown-toggle btn btn-outline-alternate">Import / Export</button>
                         <div tabindex="-1" role="menu" aria-hidden="true" class="dropdown-menu" x-placement="bottom-start" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(-7px, 33px, 0px);">
-                            <button type="button" tabindex="0" class="dropdown-item" wire:click="createPDF()">Download PDF</button>
-                            <button type="button" tabindex="0" class="dropdown-item">Download Excel</button>
+                            <button type="button" tabindex="0" class="dropdown-item" wire:click="createPDF()">Export PDF</button>
+                            {{-- <button type="button" tabindex="0" class="dropdown-item">Download Excel</button> --}}
                             <button type="button" tabindex="0" class="dropdown-item"data-toggle="modal" data-target="#importModal">Import Excel/CSV</button>
                           
                         </div>
@@ -133,10 +133,8 @@
                                                      
                                                         <div class="col-md-12" style="padding:0 !important; margin:0!important;">
                                                             
-                                                            
                                                         <div class="col-md-3 float-left" style="padding: 0 !important;" wire:ignore>
                                                             <label class="text-muted"><input type="checkbox" name="checkDatepicker" id="checkDatepicker" class="float-left" style="z-index: 999999; height: 20px; " value="value">&nbsp; <small>Filter by: Date</small></label>
-
                                                             <div id="reportrange" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; width: 100%; text-align:center;margin-top: -5px;" class="disabled">
                                                                 <i class="fa fa-calendar "></i>&nbsp;
                                                                 <span></span> <i class="fa fa-caret-down float-right"></i>

@@ -73,24 +73,18 @@
         @else
         <h6><strong>Date:</strong> All</h6>
         @endif
-        @if($unenrolledId)
         <h6><strong>Unenrolled ID:</strong> {{$unenrolledId}}</h6>
-        @endif
         </div>
 
         
 
         <div class="float-right">
-        @if($lateCounts)
         <h6 class="text-right"><strong>Lates:</strong>  {{$lateCounts}}</h6>
-        @endif
-        @if($noTimeOutRecords)
         <h6 class="text-right"><strong>No time-out Records:</strong>  {{$noTimeOutRecords}}</h6>
-        @endif
         <h6 class="text-right"><strong>Incomplete work hrs / Early Out:</strong> {{$earlyOutCounts}}</h6>
         </div>
 
-        <table  class="table table-striped table-bordered" id="position-table" >
+        <table  class="table table-striped " id="position-table" >
                                     
             <thead>
                 <tr>

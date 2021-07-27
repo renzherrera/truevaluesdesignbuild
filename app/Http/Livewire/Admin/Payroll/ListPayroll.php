@@ -19,8 +19,8 @@ use PDF;
 class ListPayroll extends Component
 {
     public $payroll_from_date ,$payroll_to_date,$payroll_description,$total_pay,$payroll_status,
-    $createMode = true, $updateMode= false,$summaryMode = false,$listMode = true,$previewMode, $selected_id,$searchTerm,$prepared_by,$approved_by,$approved_role,$prepared_role,
-    $start = null,$end = null, $project_id;
+     $updateMode= false,$summaryMode = false,$listMode = true,$previewMode, $selected_id,$searchTerm,$prepared_by,$approved_by,$approved_role,$prepared_role,
+    $start = null,$end = null, $project_id,$filter_project, $date_start_range,$date_end_range;
     use WithPagination;
     public function render()
     {
@@ -42,8 +42,16 @@ class ListPayroll extends Component
             $payrolls = $payrolls
             ->whereBetween('payroll_from_date',[$start,$end]);
         }
+
+        if($this->filter_project){
+            $payrolls = $payrolls->where('project_id',$this->filter_project);
+        }
         $payrolls = $payrolls->paginate(5);
-        return view('livewire.admin.payroll.list-payroll', compact('payrolls','cash_adv','holidays','projects'))->layout('layouts.master');
+
+        $approvedCounts = $this->getApprovedCounts();
+        $pendingCounts = $this->getPendingCounts();
+        $totalSalary = $this->getTotalSalary();
+        return view('livewire.admin.payroll.list-payroll', compact('payrolls','cash_adv','holidays','projects','approvedCounts','pendingCounts','totalSalary'))->layout('layouts.master');
     }
     public function updatingSearchTerm(): void
     {
@@ -52,7 +60,8 @@ class ListPayroll extends Component
 
     public function store() {
         $auth_user = Auth::user()->id;
-
+        $date_start_range = Carbon::parse($this->date_start_range)->toDateTimeString();
+        $date_end_range = Carbon::parse($this->date_end_range)->toDateTimeString();
         $this->validate([
             'payroll_from_date' => 'required|date',
             'payroll_to_date' => 'required|date',      
@@ -60,8 +69,8 @@ class ListPayroll extends Component
            
         ]); 
        $insertPayroll = Payroll::create([
-            'payroll_from_date' => $this->payroll_from_date,
-            'payroll_to_date' => $this->payroll_to_date,
+            'payroll_from_date' => $date_start_range,
+            'payroll_to_date' => $date_end_range,
             'payroll_description' => $this->payroll_description,
             'prepared_by' => $auth_user,
             'payroll_status' => "pending",
@@ -76,9 +85,7 @@ class ListPayroll extends Component
             'text'  => "New Payroll Added",
         ]);
 
-
     }
-
 
     public function listMode() {
         $this->createMode = true;
@@ -94,22 +101,19 @@ class ListPayroll extends Component
         $this->payroll_from_date='';
         $this->payroll_to_date='';
         $this->payroll_description='';
-  
-    
+        $this->project_id ='';
     }
 
-    
     public function edit($id)
     {
-
-        $this->createMode = false;
+        
         $this->updateMode = true;
         $this->summaryMode = false;
 
         $payroll = Payroll::findOrFail($id);
         $this->selected_id = $id;
-        $this->payroll_from_date = $payroll->payroll_from_date;
-        $this->payroll_to_date = $payroll->payroll_to_date;
+        $this->date_start_range = $payroll->payroll_from_date;
+        $this->date_end_range = $payroll->payroll_to_date;
         $this->payroll_description = $payroll->payroll_description;
         $this->project_id = $payroll->project_id;
 
@@ -170,7 +174,6 @@ class ListPayroll extends Component
 
     public function createMode() {
         $this->createMode = true;
-        $this->listMode = true;
         $this->updateMode = false;
         $this->resetInputFields();
     }
@@ -197,7 +200,7 @@ class ListPayroll extends Component
        $overtime_salary_holiday = '(positions.salary_rate * 
            CASE WHEN positions.has_holiday = true then
            (CASE WHEN attendances.attendance_date = holidays.date THEN holidays.ot_rate ELSE 1 END)ELSE 1 END /8)';
-        $payrollSummaries = Employee::with('project','cashadvances','attendances')->selectRaw('employees.*,positions.salary_rate,positions.position_title,ROUND(SUM('.$first_in.')) AS total_regular_hours,
+        $payrollSummaries = Employee::with('project','cashadvances','attendances','schedule')->selectRaw('employees.*,positions.salary_rate,positions.position_title,ROUND(SUM('.$first_in.')) AS total_regular_hours,
 
          SUM(ROUND('.$first_in.' *  '.$regular_salary_holiday.'  
          )) AS total_salarypay_with_tax,
@@ -241,7 +244,6 @@ class ListPayroll extends Component
             ->where('status','!=','paid')
             ->sum('cash_amount');
             $totalPay = $payGross - $cashAdvance;
-
             // insert into payroll_summary table
             PayrollSummary::create([
                 'payroll_id' => $id,
@@ -249,8 +251,12 @@ class ListPayroll extends Component
                 'employee_id' => $payrollSummary->id,
                 'employee_name' => $payrollSummary->first_name . ' ' . $payrollSummary->middle_name . ' ' . $payrollSummary->last_name,
                 'position_title' => $payrollSummary->position_title,
-                'project_designated' => $payrollSummary->project->project_name,
-                'schedule' => Carbon::parse($payroll_from_date)->format('F d, Y').' - '.Carbon::parse($payroll_to_date)->format('F d, Y'),
+                'project_id' => $payrollSummary->project_id,
+                // 'schedule' => Carbon::parse($payroll_from_date)->format('F d, Y').' - '.Carbon::parse($payroll_to_date)->format('F d, Y'),
+                'payroll_from_date' => $payroll_from_date,
+                'payroll_to_date' => $payroll_to_date,
+                'schedule_in'=> $payrollSummary->schedule->start_time,
+                'schedule_out'=> $payrollSummary->schedule->end_time,
                 'salary_rate' => $payrollSummary->salary_rate,
                 'total_hours_regular' => $totalRegularHours,
                 'total_hours_overtime' => $totalOvertime,
@@ -372,4 +378,61 @@ class ListPayroll extends Component
     }
 
     }  
+
+    function getApprovedCounts() {
+        $searchTerm = $this->searchTerm;
+        $payrolls = Payroll::orderBy('id','desc')->where('approved_by','!=', null);
+        if($searchTerm){
+        $payrolls = $payrolls
+        ->orWhere('id', 'LIKE', "%{$searchTerm}%")
+        ->orWhere('payroll_description', 'LIKE', "%{$searchTerm}%")
+        ->orWhere('payroll_from_date', 'LIKE', "%{$searchTerm}%")
+        ->orWhere('payroll_to_date', 'LIKE', "%{$searchTerm}%");
+        }
+        if($this->start && $this->end){
+            $payrolls = $payrolls
+            ->whereBetween('payroll_from_date',[$this->start,$this->end]);
+        }
+
+        if($this->filter_project){
+            $payrolls = $payrolls->where('project_id',$this->filter_project);
+        }
+       return $payrolls = $payrolls->count();
+
+    }
+
+    function getPendingCounts() {
+        $searchTerm = $this->searchTerm;
+        $payrolls = Payroll::orderBy('id','desc')->where('approved_by','=', null)->where('prepared_by','!=',null)->where('payroll_status','pending');
+        if($searchTerm){
+        $payrolls = $payrolls
+        ->orWhere('id', 'LIKE', "%{$searchTerm}%")
+        ->orWhere('payroll_description', 'LIKE', "%{$searchTerm}%")
+        ->orWhere('payroll_from_date', 'LIKE', "%{$searchTerm}%")
+        ->orWhere('payroll_to_date', 'LIKE', "%{$searchTerm}%");
+        }
+        if($this->start && $this->end){
+            $payrolls = $payrolls
+            ->whereBetween('payroll_from_date',[$this->start,$this->end]);
+        }
+
+        if($this->filter_project){
+            $payrolls = $payrolls->where('project_id',$this->filter_project);
+        }
+       return $payrolls = $payrolls->count();
+
+    }
+
+    function getTotalSalary() {
+        $payrollSalary = PayrollSummary::select('total_net_pay','project_id','payroll_from_date','payroll_to_date')->get();
+        if($this->start && $this->end){
+            $payrollSalary = $payrollSalary
+            ->whereBetween('payroll_from_date',[$this->start,$this->end]);
+            // ->orWhereBetween('payroll_to_date',[$this->start,$this->end]);
+        }
+            if($this->filter_project !=0){
+            $payrollSalary = $payrollSalary->where('project_id','=',$this->filter_project);
+              }
+        return $payrollSalary->sum('total_net_pay');
+    }
 }
