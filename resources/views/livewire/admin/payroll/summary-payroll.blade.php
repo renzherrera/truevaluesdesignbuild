@@ -133,7 +133,16 @@
                                                     }           
 
                                                 @endphp --}}
-                                                <div class="widget-numbers text-danger">&#8369; {{number_format($printedPayrolls->sum('total_net_pay') - $printedPayrolls->sum('cash_advance'),2)}}</div>
+                                                @php
+                                                    $total_net_pay = $printedPayrolls->sum(function ($item) {
+                                                    return $item->total_net_pay > 0 ? $item->total_net_pay : 0; });
+                                                    $cash_advance = $printedPayrolls->sum('cash_advance');
+
+                                                    if($cash_advance < $total_net_pay){
+                                                        $cash_advance = 0;
+                                                    }
+                                                @endphp
+                                                <div class="widget-numbers text-danger">&#8369; {{number_format($total_net_pay - $cash_advance,2)}}</div>
                                             </div>
                                         </div>
                                     </div>
@@ -197,26 +206,25 @@
                                                             <button class="search-icon"><span></span></button>
                                                         </div>
                                                     </div>
-                                                    @dd($printedPayrolls)
                                                    
                                                 </div>
                                             </div>
                                             <div class=" table-responsive " style="height: 325px;">
                                                 
-                                   <table  class="table table-striped table-bordered " id="position-table" >
+                                   <table  class="table table-striped " id="position-table" >
                                     
                                     <thead>
                                         <tr>
                                             <th>Employee ID</th>
                                             <th>Biometric ID</th>
-                                            <th width="20%">Employee</th>
+                                            <th width="15%">Employee</th>
                                             <th>Work Area</th>
                                             <th>Regular Shift Hours</th>
                                             <th>Total Overtime <small>Hours</small></th>
                                             <th>Total Working Hours</th>
                                             <th>Total Holiday Pay</th>
                                             <th>Gross Salary</th>
-                                            <th>Total Cash Advance</th>
+                                            <th>Cash Advance <small> Total  </small></th>
                                             <th>Total Pay</th>
                                             <th class="text-center" width="50px">Action</th>
                                         </tr>
@@ -228,15 +236,15 @@
                                         
                                         @endif
                                         @foreach ($printedPayrolls as $printed)
-                                        <tr>
+                                        <tr class="{{$printed->total_net_pay < 1 ? 'text-danger bg-light text-muted':''}}">
                                        
 
-                                            <td>{{$printed->employee_id}}</td>
-                                            <td>{{$printed->biometric_id}}</td>
+                                            <td>#{{$printed->employee_id}}</td>
+                                            <td>#{{$printed->biometric_id}}</td>
                                             <td class="text-left"><strong>{{$printed->employee_name}}</strong>
                                             <p style=" margin:-5px 0 0 0 ;"><small>{{$printed->position_title}}</small></p>
                                             </td>
-                                            <td>{{$printed->project_designated}}</td>
+                                            <td>{{$printed->projects->project_name}}</td>
                                        
                                              @php
                                                 $perHour = $printed->salary_rate/8;
@@ -248,10 +256,10 @@
                                             <td>{{$totalRegularHours}}</td>
                                             <td>{{$totalOvertime}}</td>
                                             <td>{{$totalHours}}</td>
-                                            <td>{{number_format($printed->total_holidaypay,2) }}</td>
-                                            <td>{{number_format($printed->salary_gross,2) }}</td>
-                                            <td>{{number_format($printed->cash_advance,2)}}</td>
-                                            <td>{{number_format($printed->total_net_pay,2)}}</td>
+                                            <td><span>&#8369; </span>{{number_format($printed->total_holidaypay,2) }}</td>
+                                            <td><span>&#8369; </span>{{number_format($printed->salary_gross,2) }}</td>
+                                            <td><span>&#8369; </span>{{number_format($printed->cash_advance,2)}}</td>
+                                            <td ><span>&#8369; </span>{{number_format($printed->total_net_pay,2)}}</td>
                                             <td class="text-center"><div class="dropdown">
                                                 <button type="button" aria-haspopup="true" aria-expanded="false" data-toggle="dropdown" class="dropdown-toggle btn btn-outline-link"></button>
                                                 <div tabindex="-1" role="menu" aria-hidden="true" class="dropdown-menu" x-placement="bottom-start" style="z-index: 999999;position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(0px, 33px, 0px);">

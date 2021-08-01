@@ -85,13 +85,7 @@
                                                 <div class="widget-heading">{{$prepared_by}} <small>{{ucwords($prepared_role)}}</small></div> 
 
                                             </div>
-                                            <div class="widget-content-right">
-                                                <div class="widget-numbers text-primary"></div>
-                                            </div>
-                                            <div class="widget-content-left">
-                                                <div class="widget-subheading">Approved By</div>
-                                                <div class="widget-heading">{{$approved_by}}Harold Reyes  <small>{{ucwords($approved_role)}}Superadmin</small></div> 
-                                            </div>
+                                            
                                             <div class="widget-content-right">
                                                 <div class="widget-numbers text-primary"></div>
                                             </div>
@@ -123,6 +117,21 @@
                                     <div class="widget-content-outer">
                                         <div class="widget-content-wrapper">
                                             <div class="widget-content-left">
+                                                <div class="widget-heading">Holidays</div>
+                                                <div class="widget-subheading">Total Holiday Counts</div>
+                                            </div>
+                                            <div class="widget-content-right">
+                                                <div class="widget-numbers text-info">{{$holidays}}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            {{-- <li class="bg-transparent list-group-item">
+                                <div class="widget-content p-0">
+                                    <div class="widget-content-outer">
+                                        <div class="widget-content-wrapper">
+                                            <div class="widget-content-left">
                                                 <div class="widget-heading">NO TIME OUT RECORD</div>
                                                 <div class="widget-subheading">Total Listed Employees</div>
                                             </div>
@@ -132,7 +141,7 @@
                                         </div>
                                     </div>
                                 </div>
-                            </li>
+                            </li> --}}
                         </ul>
                     </div>
                     <div class="col-md-12 col-lg-4">
@@ -147,34 +156,18 @@
                                             </div>
                                             <div class="widget-content-right">
                                                 @php
-                                                    $total_gross = $payrollSummaries->sum('total_salarypay_with_tax') + $payrollSummaries->sum('total_overtimepay_with_tax');
-                                                    $cash_advance = $cash_adv->sum('cash_amount');
-                                                    $grand_total = $total_gross - $cash_advance;   
-                                                    if($grand_total < 0){
-                                                        $grand_total = 0;
-                                                    }                                     
+                                                    $total_gross_holiday_minus_cashadvance = $payrollSummaries->sum(function ($item) {
+                                                            return $item->total_minus_cashadvances >   0 ? $item->total_minus_cashadvances : 0;
+                                                        });
+                                                                                   
                                                 @endphp
-                                                <div class="widget-numbers text-danger">&#8369; {{number_format($grand_total,2)}}</div>
+                                                <div class="widget-numbers text-danger">&#8369; {{number_format($total_gross_holiday_minus_cashadvance,2)}}</div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </li>
-                            <li class="bg-transparent list-group-item">
-                                <div class="widget-content p-0">
-                                    <div class="widget-content-outer">
-                                        <div class="widget-content-wrapper">
-                                            <div class="widget-content-left">
-                                                <div class="widget-heading">Holidays</div>
-                                                <div class="widget-subheading">Total Holiday Counts</div>
-                                            </div>
-                                            <div class="widget-content-right">
-                                                <div class="widget-numbers text-primary">{{$holidays}}</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </li>
+                            
                         </ul>
                     </div>
                 </div>
@@ -242,13 +235,7 @@
                                         
                                         @endif
                                         @foreach ($payrollSummaries as $payrollSummary)
-                                        <tr>
-                                       
-
-                                            <td>{{$payrollSummary->id}}</td>
-                                            <td>{{$payrollSummary->first_name . ' ' . $payrollSummary->middle_name . ' ' . $payrollSummary->last_name}}</td>
-                                          
-                                             @php
+                                        @php
                                                 $perHour = $payrollSummary->salary_rate/8;
                                                 $totalRegularHours = $payrollSummary->total_regular_hours;
                                                 $totalOvertime = $payrollSummary->total_overtime_hours;
@@ -261,6 +248,12 @@
                                                 $totalPay = $payGross - $cashAdvance;
                                                 $this->total_pay = $totalPay;
                                             @endphp
+                                        <tr class="{{$totalPay < 0 ? 'text-danger bg-light ' : ''}}" >
+
+                                            <td>{{$payrollSummary->id}}</td>
+                                            <td>{{$payrollSummary->first_name . ' ' . $payrollSummary->middle_name . ' ' . $payrollSummary->last_name}}</td>
+                                          
+                                             
                                             <td>{{$totalRegularHours}}</td>
                                             <td>{{$totalOvertime}}</td>
                                             <td>{{$totalHours}}</td>

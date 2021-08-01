@@ -1,7 +1,7 @@
-<div class="app-sidebar sidebar-shadow">
+<div class="app-sidebar sidebar-shadow bg-white ">
     <div class="app-header__logo">
-        <div class="logo-src"></div>
-        <div class="header__pane ml-auto">
+        <div class="logo-src "></div>
+        <div class="header__pane ">
             <div>
                 <button type="button" class="hamburger close-sidebar-btn hamburger--elastic" data-class="closed-sidebar">
                     <span class="hamburger-box">
@@ -34,7 +34,7 @@
             <ul class="vertical-nav-menu">
                 <li class="app-sidebar__heading"></li>
                 <li>
-                    <a href="{{route('home')}}" class="mm-active">
+                    <a href="{{route('admin.dashboard')}}" >
                         <i class="metismenu-icon pe-7s-display1"></i>
                         Dashboard
                     </a>
@@ -154,4 +154,14 @@
             </ul>
         </div>
     </div>
+    <script>
+        var url = window.location;
+// Will only work if string in href matches with location
+        $('ul li a[href="'+ url +'"]').addClass('mm-active');
+
+        // Will also work for relative and absolute hrefs
+        $('ul li a').filter(function() {
+            return this.href == url;
+        }).parent().addClass('mm-active');
+    </script>
 </div> 

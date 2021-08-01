@@ -29,20 +29,51 @@
                                             @error('payroll_from_date') <span class="text-danger">{{ $message }}</span> @enderror
                                         </div>
                                     </div> --}}
-                                    <div class="col-md-12" >
-                                        <div class="form-group" wire:ignore>
-                                            <label for="payroll_to_date" class="mb-3">Payroll Date<small> (Date Between)</small></label>
-                                            {{-- <input id  wire:model.defer="payroll_to_date"  type="date" class="form-control" required> --}}
+                                    {{-- <div class="col-md-12" >
+                                        <div class="col-md-6"> --}}
+
+                                            {{-- <div class="form-group" > --}}
+                                            {{-- <label for="payroll_to_date" class="mb-3">Payroll Date<small> (Date Between)</small></label>
                                            
                                             @error('payroll_to_date') <span class="text-danger">{{ $message }}</span> @enderror
                                             <div id="payroll_range" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; width: 100%; text-align:center;margin-top: -5px;" >
                                                 <i class="fa fa-calendar float-left"></i>&nbsp;
                                                 <span></span> <i class="fa fa-caret-down float-right"></i>
                                             </div>
-                                            <input type="text" wire:model ="date_start_range" id="date_start_range" >
-                                            <input type="text" wire:model ="date_end_range" id="date_end_range" >
-                                        </div>
+                                            <input type="text"  id="date_start_range" value="{{$date_start_range}}">
+                                            <input type="text" wire:model ="date_end_range" id="date_end_range" > --}}
+                                            {{-- </div> --}}
+                                            
+                                        {{-- </div> --}}
 
+                                    {{-- </div> --}}
+                                    <div class="col-md-12">
+                                        <div class="position-relative form-group">
+                                            <label for="">Project / Department</label>
+                                        <select name="" id="" wire:model.defer = "project_id" class="form-control" style="font-size: 14px;">
+                                            <option value="0"> All </option>
+                                            @foreach ($projects as $project)
+                                            <option value="{{$project->id}}">{{$project->project_name}}</option>
+                                            @endforeach
+                                        </select>
+                                        @error('project_id') <span class="text-danger">{{ $message }}</span> @enderror
+        
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="position-relative form-group">
+                                            <label for="payroll_description" class="">Payroll Start</label>
+                                            <input  wire:model.defer="date_start_range"  type="date" class="form-control" required>
+
+                                            @error('date_start_range') <span class="text-danger">{{ $message }}</span> @enderror
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="position-relative form-group">
+                                            <label for="payroll_description" class="">Payroll End</label>
+                                            <input  wire:model.defer="date_end_range"  type="date" class="form-control" required>
+                                            @error('date_end_range') <span class="text-danger">{{ $message }}</span> @enderror
+                                        </div>
                                     </div>
                                     <div class="col-md-12">
                                         <div class="position-relative form-group">
@@ -51,20 +82,7 @@
                                             @error('payroll_description') <span class="text-danger">{{ $message }}</span> @enderror
                                         </div>
                                     </div>
-                                    <div class="col-md-12">
-                                        <div class="position-relative form-group">
-                                            <label for="">Project / Department</label>
-                                        <select name="" id="" wire:model.defer = "project_id" class="form-control" style="font-size: 14px;">
-                                            <option value="0"> All </option>
-                                            @foreach ($projects as $project)
-                                            <option value="{{$project->id}}">{{$project->project_name}}</option>
-                                                
-                                            @endforeach
-                                        </select>
-                                        @error('project_id') <span class="text-danger">{{ $message }}</span> @enderror
-        
-                                        </div>
-                                    </div>
+                                    
                                     
                                 </div>
                                 
@@ -82,13 +100,20 @@
                         </div>
                     </div>
             </div>
+          
+{{--            
             <script type="text/javascript">
+                var phpDate = $('#date_start_range').val();
+                var date_start_range = new Date($('#date_start_range').val());
 
                 $(function() {
-                    var date_start_range = moment();
-                    var date_end_range = moment();
+                    let formatted_date = date_start_range.getMonth() + "/" + date_start_range.getDate()+ "/" + date_start_range.getFullYear()
+                    var date_end_range = '03/01/2014';
+                    console.log(formatted_date);
+                    $('#payroll_range span').html(formatted_date + ' - ' + date_end_range);
                     function cb(date_start_range, date_end_range) {
-                        $('#payroll_range span').html(date_start_range.format('MMMM D, YYYY') + ' - ' + date_end_range.format('MMMM D, YYYY'));
+                        
+                        $('#payroll_range span').html(formatted_date.format('MMMM D, YYYY')+ ' - ' + formatted_date.format('MMMM D, YYYY'));
                         $('#date_start_range').val(date_start_range);
                         $('#date_end_range').val(date_end_range);
                         var element3 = document.getElementById('date_start_range');
@@ -100,8 +125,8 @@
                         } 
                 
                     $('#payroll_range').daterangepicker({
-                        startDate: date_start_range,
-                        endDate: date_end_range,
+                        startDate:  date_start_range,
+                        endDate:  date_end_range,
                         ranges: {
                            'Today': [moment(), moment()],
                            'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
@@ -112,12 +137,11 @@
                         }
                     }, cb);
                 
-                    cb(date_start_range, date_end_range);
-                  
-    
-             
+                    // cb(date_start_range, date_end_range);
+                  cb( date_start_range, date_end_range);
                 });
-                
-                </script>
+        
+
+                </script> --}}
                 
         </div>

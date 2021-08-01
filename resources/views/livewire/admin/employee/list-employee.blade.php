@@ -105,8 +105,10 @@
                                                
                                             </div>
                                         </div>
-                               <table  class="table table-striped mt-2"  style=""   >
-                                
+                                <div style="margin: auto; width:100%; text-align:center; justify-content:center;" wire:loading>
+                                    <img width="250px" src="{{asset('assets/images/loader.gif')}}" alt="">
+                                </div>     
+                               <table  class="table table-striped mt-2" wire:loading.remove>
                                 <thead>
                                     <style>
                                         .text-xs
@@ -125,9 +127,7 @@
                                             flex: 1 1;
                                         }
                                    
-                                    
                                     </style>
-                                   
                                     <tr>
                                         <th>Image</th>
                                         <th>Employee Name</th>
@@ -139,11 +139,10 @@
                                         <th>Address</th>
                                         <th>Designated</th>
                                         <th class="text-center">Status</th>
-
                                         <th class="text-center" width="150px">Action</th>
                                     </tr>
-
                                 </thead>
+                                
                                 <tbody>
                                     @if($employees->count() < 1)
                                         <tr><td colspan="11" class="text-center"><h4>No employee data found</h4></td></tr>
@@ -171,9 +170,7 @@
                                             height: auto; margin:auto;"  alt="Image placeholder" src="{{ asset("storage/images/user_100px.png")}}">
                                          </a>
                                         @endif
-
                                           </div>
-
                                        </td>
                                         <td>
                                             <div class="media-body flex items-center">

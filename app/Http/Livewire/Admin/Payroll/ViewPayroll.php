@@ -11,6 +11,7 @@ use App\Models\PayrollSummary;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -64,30 +65,37 @@ class ViewPayroll extends Component
             (CASE WHEN attendances.attendance_date = holidays.date THEN holidays.ot_rate ELSE 1 END)ELSE 1 END /8)';
             $holidays = Holiday::where('date','>=',$this->payroll_from_date)->where('date','<=',$this->payroll_to_date)->count();
 
-            $payrollSummaries = Employee::selectRaw('employees.*,positions.salary_rate,
+            $payrollSummaries = Employee::distinct();
+            $payrollSummaries = $payrollSummaries
+           ->whereBetween('attendances.attendance_date',[$this->payroll_from_date,$this->payroll_to_date])
+           ->where('attendances.attendance_status','unpaid')
+           ->leftJoin('attendances', 'attendances.biometric_id', '=', 'employees.biometric_id')
+           ->leftJoin('holidays', 'holidays.date', '=', 'attendances.attendance_date')
+           ->leftJoin('positions', 'employees.position_id', '=', 'positions.id')->groupBy(['employees.id', 'attendances.biometric_id'])
+           ->selectRaw('employees.*,positions.salary_rate,
             ROUND(SUM('.$first_in.')) AS total_regular_hours,
-            SUM(ROUND('.$first_in.' *  '.$regular_salary_holiday.'  
-            )) AS total_salarypay_with_tax,
+            SUM(ROUND('.$first_in.' *  '.$regular_salary_holiday.')) AS total_salarypay_with_tax,
             SUM(ROUND(('.$first_in.')  * '.$regular_salary_holiday.' - (('.$first_in.')*(positions.salary_rate))/8       )) AS regularholiday_pay,
             SUM(ROUND(('.$first_in.' )  * (positions.salary_rate * 1 /8) )) AS total_regular_pay,
    
    
-            SUM(ROUND( '.$overtime_in.' )) AS total_overtime_hours,
-            SUM(ROUND(('.$overtime_in.' )  * '.$overtime_salary_holiday.' )) AS total_overtimepay_with_tax,
-            SUM(ROUND(('.$overtime_in.' )  * (positions.salary_rate * 1 /8) )) AS total_overtime_pay,
-            SUM(ROUND(('.$overtime_in.' )  * '.$overtime_salary_holiday.' - (('.$overtime_in.' )*(positions.salary_rate))/8       )) AS overtimeholiday_pay
+            IFNULL(SUM(ROUND( '.$overtime_in.' )),0) AS total_overtime_hours,
+            IFNULL(SUM(ROUND(('.$overtime_in.' )  * '.$overtime_salary_holiday.' )),0) AS total_overtimepay_with_tax,
+            IFNULL(SUM(ROUND(('.$overtime_in.' )  * (positions.salary_rate * 1 /8) )),0) AS total_overtime_pay,
+            ifnull(SUM(ROUND(('.$overtime_in.' )  * '.$overtime_salary_holiday.' - (('.$overtime_in.' )*(positions.salary_rate))/8 )),0) AS overtimeholiday_pay,
+
+            SUM(ROUND('.$first_in.' *  '.$regular_salary_holiday.')) + 
+            IFNULL(SUM(ROUND(('.$overtime_in.' )  * '.$overtime_salary_holiday.' )),0) - 
+            IFNULL((SELECT SUM(cash_amount) FROM cash_advances WHERE employee_id = employees.id),0) as total_minus_cashadvances')
+            ->havingRaw('SUM(ROUND('.$first_in.' *  '.$regular_salary_holiday.')) + 
+            IFNULL(SUM(ROUND(('.$overtime_in.' )  * '.$overtime_salary_holiday.' )),0) - 
+            IFNULL((SELECT SUM(cash_amount) FROM cash_advances WHERE employee_id = employees.id),0) > 0');;
+
             
-            ');
             if($this->project_id && $this->project_id != 0){
-            $payrollSummaries = $payrollSummaries->where('employees.project_id',$this->project_id);
-             }
-            $payrollSummaries = $payrollSummaries
-           ->whereBetween('attendances.attendance_date',[$this->payroll_from_date,$this->payroll_to_date])
-           ->leftJoin('attendances', 'attendances.biometric_id', '=', 'employees.biometric_id')
-           ->leftJoin('holidays', 'holidays.date', '=', 'attendances.attendance_date')
-           // ->leftJoin('cash_advances', 'cash_advances.employee_id', '=', 'employees.id')
-           ->leftJoin('positions', 'employees.position_id', '=', 'positions.id')
-           ->groupBy('employees.id');
+                $payrollSummaries = $payrollSummaries->where('employees.project_id',$this->project_id);
+                 }
+          
 
 
         $this->payrollSummaries = $payrollSummaries;
@@ -127,7 +135,7 @@ class ViewPayroll extends Component
            $attendances = Attendance::has('employees')->orderBy('attendance_date','desc')->orderBy('first_onDuty','asc')
            ->paginate(5);
 
-         
+        //    dd($payrollSummaries);
             return view('livewire.admin.payroll.preview-payroll',compact('payrollSummaries','payrolls','holidays','cash_adv','attendances'))->layout('layouts.master');
          }
     }
@@ -198,9 +206,9 @@ class ViewPayroll extends Component
                         ->setOption('margin-bottom','20')
                         ->setOption('footer-center','')
                         ->setOption('footer-left','');
-        $payrolls->update([
-            'payroll_status' => 'printed',
-        ]);
+        // $payrolls->update([
+        //     'payroll_status' => 'printed',
+        // ]);
        
     // session()->flash('message','Order deleted successfully!');
   

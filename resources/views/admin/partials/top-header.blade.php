@@ -1,7 +1,7 @@
-<div class="app-header header-shadow">
+    <div class="app-header header-shadow  bg-white header-text-dark">
             <div class="app-header__logo ">
                 @if ($company)
-                <div class="mr-3" > <img class="logo" src="{{asset('storage/images/'. $company->image)}}" width="100%" alt=""></div>
+                <div class="mr-3 pr-2" > <img class="logo" src="{{asset('storage/images/'. $company->image)}}" width="100%" alt=""></div>
                 @else
                 <div class="m-5" > <h2><strong>truevalue.</strong></h2></div>
 

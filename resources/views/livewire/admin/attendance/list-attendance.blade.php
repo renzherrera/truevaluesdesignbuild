@@ -169,8 +169,10 @@
                                                    
                                                 </div>
                                 <div class=" table-responsive " style="height: 325px;">
-                                                
-                                   <table  class="table table-striped table-bordered" id="position-table" >
+                                    <div style="margin: auto; width:100%; text-align:center; justify-content:center;" wire:loading>
+                                        <img width="250px" src="{{asset('assets/images/loader.gif')}}" alt="">
+                                    </div>         
+                                   <table  class="table table-striped " id="position-table" wire:loading.remove>
                                     
                                     <thead>
                                         <tr>

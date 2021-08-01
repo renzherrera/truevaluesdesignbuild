@@ -28,4 +28,9 @@ class Payroll extends Model
     public function projects() {
         return $this->belongsTo(Project::class,'project_id','id');
     }
+
+    public function payrolls() {
+        return $this->hasMany(PayrollSummary::class,'payroll_id','id');
+    }
+    
 }

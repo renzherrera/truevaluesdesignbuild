@@ -32,13 +32,14 @@ use Illuminate\Support\Facades\Route;
 
 
 Auth::routes();
+// Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
-Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 Route::group(['middleware'=> 'auth'], function(){
     Route::group(['prefix' => 'admin', 'as'=> 'admin.'],function(){
      
         //  Route::post('admin/settings/save-settings',[SettingsController::class,'update'])->name('settings.update');
         //  Route::get('register-employee',[Employees::class,'create'])->name('employees.create');
+        Route::get('dashboard', [App\Http\Controllers\HomeController::class, 'index'])->name('dashboard');
 
     Route::get('list-employees',ListEmployee::class)->name('list-employees');
     Route::get('list-position',ListPosition::class)->name('list-position');

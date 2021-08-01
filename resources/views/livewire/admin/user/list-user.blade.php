@@ -69,7 +69,11 @@
                                                    
                                                 </div>
                                             </div>
-                                   <table  class="table table-striped mt-2">
+                                            <div style="margin: auto; width:100%; text-align:center; justify-content:center;" wire:loading>
+                                                <img width="250px" src="{{asset('assets/images/loader.gif')}}" alt="">
+                                            </div>         
+                                            
+                                   <table  class="table table-striped mt-2" wire:loading.remove>
                                     
                                     <thead>
                                         <style>

@@ -31,6 +31,7 @@
 <!-- Latest compiled and minified CSS -->
 {{-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.16/dist/css/bootstrap-select.min.css"> --}}
 
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/pikaday/css/pikaday.css">
 
 {{-- DATE PICKER  --}}
 {{-- <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js" ></script> --}}
@@ -40,14 +41,14 @@
 
 </head>
 <body>
-    <div class="app-container app-theme-white body-tabs-shadow fixed-sidebar fixed-header">
+    <div class="app-container app-theme-white body-tabs-shadow fixed-header body-tabs-shadow fixed-sidebar" >
         
         @include('admin.partials.top-header')
 
         <div class="app-main"> 
             @include('admin.partials.sidebar')
             
-
+          
                    <div class="app-main__outer">
                         <div class="app-main__inner">
 
@@ -132,12 +133,8 @@
 {{-- <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script> --}}
 
 <script type="text/javascript" src="{{ asset('assets/scripts/main.js') }}"></script></body>
-
-
-
-
+<script src="https://cdn.jsdelivr.net/npm/pikaday/pikaday.js"></script>
 {{-- <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.16/js/bootstrap-select.min.js" integrity="sha512-Aw0FBonk9dKNiE8faR0aSFStSNUa8fEqAVisOmzj6zDbALPe7AzoPHKm7RkOa+KwCy90GXW7lqTsdO1wdGGkHA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> --}}
-
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js" integrity="sha512-2ImtlRlf2VVmiGZsjm9bEyhjGW4dU7B6TNwh/hx/iSByxNENtj3WVE6o/9Lj4TJeVXPi4bnOIMXFIJJAeufa0A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
