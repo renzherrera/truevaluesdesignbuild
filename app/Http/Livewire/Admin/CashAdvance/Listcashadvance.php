@@ -170,4 +170,24 @@ class Listcashadvance extends Component
         $this->resetInputFields();
         }
     }
+
+    function revertPending($id) {
+
+        $cashadvance = CashAdvance::find($id);
+        if($cashadvance->approved_by && Auth::user()->role == "superadmin"){
+
+        $cashadvance->update([
+            'approved_by' => null,
+            'status' => "pending",
+        ]);
+
+
+        $this->emit('swal:modal', [
+            'icon'  => 'success',
+            'title' => 'Success!!',
+            'text'  => "Cash advance for {$cashadvance->employees->first_name} successfully reverted!",
+        ]);
+        }
+
+    }
 }

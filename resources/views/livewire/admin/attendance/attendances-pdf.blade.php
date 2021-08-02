@@ -61,7 +61,7 @@
 </style>
    
     <div class="col-md-12 ">
-        <h5 class=" mb-2 text-center"><strong>List of Attendances</strong></h5>
+        <h5 class=" mb-2 text-center"><strong>{{$enrolledAttendance ? 'Enrolled Attendances' : 'Unenrolled Attendances'}}</strong></h5>
         <div class="float-left">
         @if($projectName)
         <h6><strong>Department/Project:</strong>  {{$projectName->project_name}}</h6>
@@ -73,7 +73,9 @@
         @else
         <h6><strong>Date:</strong> All</h6>
         @endif
-        <h6><strong>Unenrolled ID:</strong> {{$unenrolledId}}</h6>
+        <h6><strong>Incomplete work hrs / Early Out:</strong> {{$earlyOutCounts}}</h6>
+
+        {{-- <h6><strong>Unenrolled ID:</strong> {{$unenrolledId}}</h6> --}}
         </div>
 
         
@@ -81,15 +83,16 @@
         <div class="float-right">
         <h6 class="text-right"><strong>Lates:</strong>  {{$lateCounts}}</h6>
         <h6 class="text-right"><strong>No time-out Records:</strong>  {{$noTimeOutRecords}}</h6>
-        <h6 class="text-right"><strong>Incomplete work hrs / Early Out:</strong> {{$earlyOutCounts}}</h6>
         </div>
 
         <table  class="table table-striped " id="position-table" >
                                     
             <thead>
                 <tr>
+                    @if ($enrolledAttendance)
                     <th width="80px">Emp ID</th>
                     <th width="200px">Name</th>
+                    @endif
                     <th>Biometric ID</th>
                     <th width="180px">Date</th>
                     <th>Time-in</th>
@@ -111,8 +114,10 @@
 
                 <tr>
                     {{-- @dd($attendance->employees->schedule->start_time) --}}
+                    @if ($enrolledAttendance)
                     <td><span class="text-muted ">#&nbsp;</span>{{$attendance->employees->id}}</td>
                     <td>{{$attendance->employees->first_name . ' ' . $attendance->employees->middle_name .' ' . $attendance->employees->last_name}}</td>
+                    @endif
                     <td><span class="text-muted">#&nbsp;</span>{{$attendance->biometric_id}}</td>
                     <td>{{ Carbon\Carbon::parse($attendance->attendance_date)->format('F d, Y') }}</td>
                     <td>{{ Carbon\Carbon::parse($attendance->first_onDuty)->format('g:i A') }}</td>
@@ -153,7 +158,7 @@
                     // }
                    
                     if($otdiffInHours >4){
-                    $otdiffInHours = round($ottimeOut->diffInMinutes($ottimeIn) / 60) - 1; 
+                    $otdiffInHours = round($ottimeOut->diffInMinutes($ottimeIn) / 60) ; 
                     }
                     
                     if (!$attendance->second_offDuty){ 
@@ -177,7 +182,7 @@
                         -
                         @endif
                     </td>
-                    <td style="font-weight: 700" class="text-center {{$otdiffInHours >= 8 ? 'text-primary' : ($otdiffInHours < 8 && $otdiffInHours > 4 ? 'text-warning' : ($otdiffInHours == 0 ? 'text-dark' : 'text-danger'))}}">
+                    <td style="font-weight: 700" class="text-center {{$otdiffInHours > 0 ? 'text-primary' : 'text-dark'}}">
                       
                         @if ($otdiffInHours == 0)
                         -

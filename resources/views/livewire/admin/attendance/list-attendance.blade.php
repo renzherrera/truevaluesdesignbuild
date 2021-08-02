@@ -41,8 +41,9 @@
             </div>           
 
             <div>
+                @if ($enrolledAttendance)
                 <div class="row">
-                    <div class="col-md-6 col-xl-3">
+                    <div class="col-md-6 col-xl-4">
                         <div class="card mb-3 widget-content bg-night-fade">
                             <div class="widget-content-wrapper text-white">
                                 <div class="widget-content-left">
@@ -55,7 +56,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6 col-xl-3">
+                    <div class="col-md-6 col-xl-4">
                         <div class="card mb-3 widget-content bg-arielle-smile">
                             <div class="widget-content-wrapper text-white">
                                 <div class="widget-content-left">
@@ -68,7 +69,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6 col-xl-3">
+                    <div class="col-md-6 col-xl-4">
                         <div class="card mb-3 widget-content bg-happy-green">
                             <div class="widget-content-wrapper text-white">
                                 <div class="widget-content-left">
@@ -81,7 +82,8 @@
                             </div>
                         </div>
                     </div>
-                    <div class=" d-lg-block col-md-6 col-xl-3">
+
+                    {{-- <div class=" d-lg-block col-md-6 col-xl-3">
                         <div class="card mb-3 widget-content bg-premium-dark">
                             <div class="widget-content-wrapper text-white">
                                 <div class="widget-content-left">
@@ -93,8 +95,10 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div> --}}
                 </div>
+                @endif
+
             </div>
             
             {{-- @if ($updateMode)
@@ -108,60 +112,94 @@
                 
             <div class="tab-content">
                 <div class="tab-pane tabs-animation fade show active" id="tab-content-0" role="tabpanel">
-                    <h5>List of Attendances    </h5>
-                    
-                    <div class="dropdown ">
-                        <div class="btn btn-dark float-left d-flex mr-3" style="cursor: pointer;" data-toggle="modal" data-target="#attendance_modal"> 
-                            <i class="pe-7s-plus text-white pr-3"  style="font-size: 19px!important; ">
-                            </i>
-                            <span style="vertical-align: baseline; margin:auto; font-size:13px; padding-right:25px;">Add Record</span>
+                  <div class="form-row mb-2">
+                    <div class="col-md-12">
+                        <div class="col-md-3 float-left" style="padding: 0 !important;" wire:ignore>
+                            <label class="text-muted"><input type="checkbox" name="checkDatepicker" id="checkDatepicker" class="float-left" style="z-index: 999999; height: 20px; " value="value">&nbsp; <small>Filter by: Date</small></label>
+                            <div id="reportrange" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; width: 100%; text-align:center;margin-top: -5px;" class="disabled">
+                                <i class="fa fa-calendar "></i>&nbsp;
+                                <span></span> <i class="fa fa-caret-down float-right"></i>
+                            </div>
                         </div>
-                        <button type="button" aria-haspopup="true" aria-expanded="true" data-toggle="dropdown" class="mb-2 mr-2  dropdown-toggle btn btn-outline-alternate">Import / Export</button>
-                        <div tabindex="-1" role="menu" aria-hidden="true" class="dropdown-menu" x-placement="bottom-start" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(-7px, 33px, 0px);">
-                            <button type="button" tabindex="0" class="dropdown-item" wire:click="createPDF()">Export PDF</button>
-                            {{-- <button type="button" tabindex="0" class="dropdown-item">Download Excel</button> --}}
-                            <button type="button" tabindex="0" class="dropdown-item"data-toggle="modal" data-target="#importModal">Import Excel/CSV</button>
-                          
+                        <div class="col-md-2 float-left " >
+                            <label class="text-muted"><small>Filter by: Department / Project</small></label>
+                            {{-- <label for=""><small>Filter</small></label> --}}
+                        <select wire:model= "project_id" class="form-control text-center " style="height: 33px; font-size: 14px; margin-top: -5px;cursor:pointer;" {{!$enrolledAttendance ? 'disabled' : ''}}>
+                            <option value="" >All</option>
+                            @foreach ($projects as $project)
+                            <option value="{{$project->id}}" >{{$project->project_name}}</option>
+                            @endforeach
+                        </select>
+                        </div>
+                        <div class=" float-left">
+                            <button type="button" aria-haspopup="true" aria-expanded="true" data-toggle="dropdown" class=" mr-2 dropdown-toggle btn btn-outline-alternate" style="margin-top: 23px;">Import / Export</button>
+                            <div tabindex="-1" role="menu" aria-hidden="true" class="dropdown-menu" x-placement="bottom-start" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(-7px, 33px, 0px);">
+                                <button type="button" tabindex="0" class="dropdown-item" wire:click="createPDF()">Export PDF</button>
+                                {{-- <button type="button" tabindex="0" class="dropdown-item">Download Excel</button> --}}
+                                <button type="button" tabindex="0" class="dropdown-item"data-toggle="modal" data-target="#importModal">Import Excel/CSV</button>
+                            </div>
+                        </div>
+                        
+
+                    </div>
+
+                
+                  </div>
+                  <div class="col-md-12" style="padding:0 !important; margin:0!important;">
+                    <div class="nav nav-pills "  >
+
+                        <div class="text-uppercase col-md-9 p-0" style="margin-bottom: -40px">
+                            <div class="float-left" >
+                                 
+                                <div class="btn btn-dark float-left d-flex mr-3" style="cursor: pointer;" data-toggle="modal" data-target="#attendance_modal"> 
+                                    <i class="pe-7s-plus text-white pr-3"  style="font-size: 19px!important; ">
+                                    </i>
+                                    <span style="vertical-align: baseline; margin:auto; font-size:13px; padding-right:25px;">Add Record</span>
+                                </div>
+        
+                            </div>
+                                <div class="float-left ">
+                                    
+                                    <a wire:click="enrolledTab()" class="nav-link {{$enrolledAttendance ? 'active' : ''}}">
+                                    <span>Enrolled</span>
+                                    <div class="badge badge-pill {{$enrolledAttendance ? 'badge-light' : 'badge-primary'}}">{{$attendanceCount}}</div>
+                                    </a>
+                                </div>
+                                <div class="float-left">
+
+                                    <a wire:click="unEnrolledTab()" class="nav-link {{$unenrolled ? 'active' : ''}}">
+                                <span>Unenrolled</span>
+                                        <div class="badge badge-pill {{$unenrolled ? 'badge-light' : 'badge-primary'}}">{{$unenrolledAttendance}}</div>
+                                    </a>
+                                </div>
+                              
+                                    
+                            {{-- <a disabled="" href="javascript:void(0);" class="nav-link disabled">
+                                <i class="nav-link-icon pe-7s-box1"> </i><span>Disabled Link</span>
+                            </a> --}}
+                        </div>
+                        <div class="col-md-3">
+                                <div class="search-wrapper float-right  active ">
+                                    <div class="input-holder ">
+        
+                                        <input type="text" class="search-input col-sm-12 col-md-12" wire:model="searchTerm" placeholder="Type to search" {{!$enrolledAttendance ? 'disabled' : ''}}>
+        
+                                        <button class="search-icon"><span></span></button>
+                                    </div>
+                                </div>
                         </div>
                     </div>
-                    <div class="main-card card ">
+                    
+                </div>
+                    <div class="main-card card " style="margin-top: -15px;">
                         
                         <div class="card-body">
+                    <h5 class="card-title">List of Attendances</h5>
                                 <div class="col-sm-12  date-filter" style="width: 100%">
                                             <div class="form-row mb-3">
                                                     {{-- {{Carbon\Carbon::parse($start)->format('F d, Y') . ' - ' . Carbon\Carbon::parse($end)->format('F d, Y')}} --}}
                                                      
-                                                        <div class="col-md-12" style="padding:0 !important; margin:0!important;">
-                                                            
-                                                        <div class="col-md-3 float-left" style="padding: 0 !important;" wire:ignore>
-                                                            <label class="text-muted"><input type="checkbox" name="checkDatepicker" id="checkDatepicker" class="float-left" style="z-index: 999999; height: 20px; " value="value">&nbsp; <small>Filter by: Date</small></label>
-                                                            <div id="reportrange" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; width: 100%; text-align:center;margin-top: -5px;" class="disabled">
-                                                                <i class="fa fa-calendar "></i>&nbsp;
-                                                                <span></span> <i class="fa fa-caret-down float-right"></i>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-2 float-left " >
-                                                            <label class="text-muted"><small>Filter by: Department / Project</small></label>
-
-                                                            
-                                                            {{-- <label for=""><small>Filter</small></label> --}}
-                                                          <select wire:model= "project_id" class="form-control text-center " style="height: 33px; font-size: 14px; margin-top: -5px;cursor:pointer;">
-                                                              <option value="" >All</option>
-                                                              @foreach ($projects as $project)
-                                                              <option value="{{$project->id}}" >{{$project->project_name}}</option>
-                                                              @endforeach
-                                                          </select>
-                                                        </div>
-                                                        
-    
-                                                        <div class="search-wrapper  active float-right">
-                                                            <div class="input-holder ">
-                                                                <input type="text" class="search-input " wire:model="searchTerm" placeholder="Type to search">
-                                                                <button class="search-icon"><span></span></button>
-                                                            </div>
-                                                        </div>
-                                                        
-                                                        </div>
+                                                    
                                                  
                                              {{-- date range picker data source  --}}
                                                 <input type="text" id="start" wire:model ="start" hidden>
@@ -176,8 +214,11 @@
                                     
                                     <thead>
                                         <tr>
+                                            @if ($enrolledAttendance)
+
                                             <th>Employee ID</th>
                                             <th>Name</th>
+                                            @endif
                                             <th width="150px">Biometric ID</th>
                                             <th>Date of Attendance</th>
                                             <th>Time-in</th>
@@ -200,15 +241,18 @@
 
                                         <tr>
                                             {{-- @dd($attendance->employees->schedule->start_time) --}}
+                                            @if ($enrolledAttendance)
                                             <td><span class="text-muted text-xs">#&nbsp;</span>{{$attendance->employees->id}}</td>
                                             <td>{{$attendance->employees->first_name . ' ' . $attendance->employees->middle_name .' ' . $attendance->employees->last_name}}</td>
+                                            @endif
+
                                             <td><span class="text-muted text-xs">#&nbsp;</span>{{$attendance->biometric_id}}</td>
                                             <td>{{ Carbon\Carbon::parse($attendance->attendance_date)->format('F d, Y') }}</td>
                                             <td>{{ Carbon\Carbon::parse($attendance->first_onDuty)->format('g:i A') }}</td>
                                             <td class="text-center">
                                                 @if ($attendance->first_offDuty)
                                                 {{ Carbon\Carbon::parse($attendance->first_offDuty)->format('g:i A') }}
-                                                @elseif($attendance->second_onDuty && !$attendance->second_offDuty)
+                                                @elseif($attendance->second_onDuty && !$attendance->first_offDuty)
                                                 {{ Carbon\Carbon::parse($attendance->second_onDuty)->format('g:i A') }}
                                                 @else
                                                 -
@@ -242,15 +286,16 @@
                                             // }
                                            
                                             if($otdiffInHours >4){
-                                            $otdiffInHours = round($ottimeOut->diffInMinutes($ottimeIn) / 60) - 1; 
+                                            $otdiffInHours = round($ottimeOut->diffInMinutes($ottimeIn)/60); 
                                             }
                                             
                                             if (!$attendance->second_offDuty){ 
                                                 $otdiffInHours= 0;
                                             }
-                                           
                                            @endphp
-                                        <td style="font-weight: 700" class="text-center {{$diffInHours >= 8 ? 'text-primary' : ($diffInHours < 8 && $diffInHours > 4 ? 'text-warning' : 'text-danger')}}">{{$diffInHours}}</td>
+                                           {{-- regular total hours  --}}
+                                            <td style="font-weight: 700" class="text-center {{$diffInHours >= 8 ? 'text-primary' : ($diffInHours < 8 && $diffInHours > 4 ? 'text-warning' : 'text-danger')}}">{{$diffInHours}}</td>
+                                            {{-- ot time in --}}
                                             <td>
                                                 @if ($attendance->second_onDuty && $attendance->second_offDuty)
                                                 {{ Carbon\Carbon::parse($attendance->second_onDuty)->format('g:i A') }}
@@ -258,7 +303,7 @@
                                                 -
                                                 @endif
                                             </td>
-                                          
+                                          {{-- ot time out  --}}
                                             <td>
                                                 @if ($attendance->second_offDuty)
                                                 {{ Carbon\Carbon::parse($attendance->second_offDuty)->format('g:i A') }}
@@ -266,7 +311,8 @@
                                                 -
                                                 @endif
                                             </td>
-                                            <td style="font-weight: 700" class="text-center {{$otdiffInHours >= 8 ? 'text-primary' : ($otdiffInHours < 8 && $otdiffInHours > 4 ? 'text-warning' : ($otdiffInHours == 0 ? 'text-dark' : 'text-danger'))}}">
+                                            {{-- total ot hours  --}}
+                                            <td style="font-weight: 700" class="text-center {{$otdiffInHours > 0 ? 'text-primary' : 'text-dark'}}">
                                               
                                                 @if ($otdiffInHours == 0)
                                                 -
@@ -289,10 +335,7 @@
                                     </tbody>
                                   </table>
                                   </div>
-                                  <div class="card-footer justify-content-center">
-                                    {{$attendances->links('pagination')}}
-    
-                                  </div>
+                                
                                 </div>
     
                                 
@@ -301,7 +344,9 @@
     
                             
                         </div>
-        
+                        <div class="mt-2 justify-content-center">
+                            {{$attendances->links('pagination')}}
+                          </div>
                     </div>
         
                 </div>

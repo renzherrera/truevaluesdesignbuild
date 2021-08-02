@@ -51,9 +51,9 @@
                         
                         {{-- <h4 class="card-title float-left">List of Payrolls    </h4> --}}
                             
-                        <div class="col-md-12">
+                        <div class="col-sm-12">
 
-                            <div class="col-md-3 float-left" style="padding:0; margin:0;" wire:ignore>
+                            <div class="col-sm-3 float-left" style="padding:0; margin:0;" wire:ignore>
                                 
 
                                 <label class="text-muted"><input type="checkbox" name="checkDatepicker" id="checkDatepicker" class="float-left" style="z-index: 999999; height:20px;" value="value">&nbsp;<small>Filter by: Date</small></label>
@@ -63,7 +63,7 @@
                                 </div>
                             </div>
 
-                            <div class="col-md-2 float-left " >
+                            <div class="col-sm-2 float-left " >
                                 <label class="text-muted"><small>Filter by: Department / Project</small></label>
 
                                 
@@ -76,7 +76,7 @@
                             </select>
                             </div>
                        
-                            <div class="col-md-2 float-left " style="margin-top: 20px;">
+                            <div class="col-sm-2 float-left " style="margin-top: 20px;">
                                 <button type="button" aria-haspopup="true" aria-expanded="true" data-toggle="dropdown" class=" mr-2 dropdown-toggle btn btn-outline-alternate">
                                     <span style="font-size: 14px;">Export / Download</span>
                                 </button>

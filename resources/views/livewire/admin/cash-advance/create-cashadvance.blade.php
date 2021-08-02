@@ -36,7 +36,7 @@
 
                                 </div>
                             </div> 
-                            
+
                         </div>
                          <button wire:click.prevent="store()" class=" btn btn-warning px-5 py-2  float-right">Request for Cash Advance</button>
 

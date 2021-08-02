@@ -21,12 +21,16 @@ class ListAttendance extends Component
     use WithFileUploads;
     public $importExcelFile,$selected_id, $biometric_id, $attendance_date, $first_onDuty,$first_offDuty=null,$second_onDuty=null,$second_offDuty=null,
             $noTimeOutRecords, $start = null, $end = null, $searchTerm, $project_id, $lateCounts, $unenrolledAttendance,$unenrolledId,$earlyOutCounts,
-            $updateMode = false,$projectName;
+            $updateMode = false,$projectName,$enrolledAttendance = true,$unenrolled = false;
 
     public function render()
     {
         //get attendance method for tables
+        if($this->enrolledAttendance){
         $attendances = $this->getAttendanceLists()->paginate(5);
+         }else{
+        $attendances = $this->getUnenrolledAttendance()->paginate(5);
+         }
         //get no time out records for widgets
         $noTimeOutRecords = $this->getNoTimeOutRecords();
         //get late counts for widgets
@@ -36,19 +40,20 @@ class ListAttendance extends Component
         //get unenrolled Id
         $unenrolledId = $this->getUnenrolledId();
         //get unenrolled attendance x
-        $unenrolledAttendance = $this->getUnenrolledAttendance();
+        $unenrolledAttendance = $this->getUnenrolledAttendance()->count();
         //get projects for project filter
         $projects = Project::select('id','project_name')->get();
         //employees for create edit form fields
         $employees = Employee::select('biometric_id','first_name','middle_name','last_name')->whereNotNull('biometric_id')->get();
 
+        $attendanceCount = $this->getAttendanceLists()->count();
 
         $this->lateCounts = $lateCounts;
         $this->earlyOutCounts = $earlyOutCounts;
         $this->noTimeOutRecords = $noTimeOutRecords;
         $this->unenrolledAttendance = $unenrolledAttendance;
         $this->unenrolledId = $unenrolledId;
-        return view('livewire.admin.attendance.list-attendance',compact('attendances','projects','employees'))->layout('layouts.master');
+        return view('livewire.admin.attendance.list-attendance',compact('attendances','projects','employees','attendanceCount'))->layout('layouts.master');
     }
     function getAttendanceLists() {
         $searchTerm = $this->searchTerm;
@@ -136,6 +141,8 @@ class ListAttendance extends Component
         ->join('schedules', 'schedules.id', '=', 'employees.schedule_id')->count();
     }
 
+    
+
     function getEarlyOut(){
         $searchTerm = $this->searchTerm;
         $start =Carbon::parse($this->start)->toDateTimeString();
@@ -176,7 +183,7 @@ class ListAttendance extends Component
         ->whereBetween('attendance_date',[$start,$end]);
         }
      
-       return $unenrolledAttendance = $unenrolledAttendance->get()->count();
+       return $unenrolledAttendance = $unenrolledAttendance;
 
     }
 
@@ -189,7 +196,7 @@ class ListAttendance extends Component
         ->whereBetween('attendance_date',[$start,$end]);
         }
      
-       return $unenrolledId = $unenrolledId->get()->count();
+       return $unenrolledId = $unenrolledId->count();
 
     }
     public function updatingSearchTerm(): void
@@ -357,12 +364,17 @@ class ListAttendance extends Component
 
     public function createPDF()
     {
+        $enrolledAttendance = $this->enrolledAttendance;
         $date_filter = null;
         if($this->start && $this->end){
             $date_filter = Carbon::parse($this->start)->format('F d, Y'). ' - ' . Carbon::parse($this->end)->format('F d, Y');
         }
         //get attendance method for tables
-        $attendances = $this->getAttendanceLists()->get();
+        if($enrolledAttendance){
+            $attendances = $this->getAttendanceLists()->get();
+             }else{
+            $attendances = $this->getUnenrolledAttendance()->get();
+             }
         //get no time out records for widgets
         $noTimeOutRecords = $this->getNoTimeOutRecords();
         //get late counts for widgets
@@ -381,9 +393,20 @@ class ListAttendance extends Component
         // $projects = Project::join('project_images','projects.id','=','project_images.project_id');
         view()->share('attendances',$attendances);
         
-        $pdf = PDF::loadView('livewire.admin.attendance.attendances-pdf', compact('attendances','projectName','date_filter','lateCounts','noTimeOutRecords','unenrolledId','earlyOutCounts'))
+        $pdf = PDF::loadView('livewire.admin.attendance.attendances-pdf', compact('attendances','projectName','date_filter','lateCounts','noTimeOutRecords','unenrolledId','earlyOutCounts','enrolledAttendance'))
         ->setPaper('a4')->setOrientation('landscape');
        $pdf->setOption('header-html', view('pdf.pdf-header'));
         return $pdf->stream('attendance.pdf');
+    }
+
+    function enrolledTab() {
+        $this->enrolledAttendance = true;
+        $this->unenrolled = false;
+    }
+
+    function unEnrolledTab() {
+        $this->enrolledAttendance = false;
+        $this->unenrolled = true;
+        $this->project_id = 0;
     }
 }

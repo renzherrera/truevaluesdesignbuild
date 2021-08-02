@@ -65,9 +65,7 @@ class ViewPayroll extends Component
             (CASE WHEN attendances.attendance_date = holidays.date THEN holidays.ot_rate ELSE 1 END)ELSE 1 END /8)';
             $holidays = Holiday::where('date','>=',$this->payroll_from_date)->where('date','<=',$this->payroll_to_date)->count();
 
-            $payrollSummaries = Employee::distinct();
-            $payrollSummaries = $payrollSummaries
-           ->whereBetween('attendances.attendance_date',[$this->payroll_from_date,$this->payroll_to_date])
+            $payrollSummaries = Employee::distinct()->whereBetween('attendances.attendance_date',[$this->payroll_from_date,$this->payroll_to_date])
            ->where('attendances.attendance_status','unpaid')
            ->leftJoin('attendances', 'attendances.biometric_id', '=', 'employees.biometric_id')
            ->leftJoin('holidays', 'holidays.date', '=', 'attendances.attendance_date')

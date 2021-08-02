@@ -117,6 +117,12 @@
                                                             <i class=" pe-7s-like2 text-white"> </i><span class="ml-3">Approved</span>
                                                         </button>
                                                         @endif
+
+                                                        @if ($cashadvance->approved_by && Auth::user()->role == "superadmin" && $cashadvance->status == "approved")
+                                                        <button type="button" tabindex="0" class="dropdown-item bg-warning text-white" wire:click="$emit('revertPending',{{$cashadvance->id}})">
+                                                            <i class="pe-7s-refresh text-dark"> </i><span class="ml-3 text-dark">Revert to Pending</span>
+                                                        </button>
+                                                        @endif
                                                     
                                                         <button type="button" tabindex="0" class="dropdown-item" wire:click="edit({{$cashadvance->id}})" >
                                                             <i class=" pe-7s-settings"></i><span class="ml-3">Edit</span>
@@ -196,6 +202,30 @@
                             Swal.fire(
                                 'Cancelled',
                                 'Approving cash advance cancelled :)',
+                                'error'
+                            )
+                        }
+                    });
+                })
+
+                @this.on('revertPending', id => {
+                    Swal.fire({
+                    title: 'Approve this cash advance?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Approve',
+                    cancelButtonText: 'Cancel',
+                    reverseButtons: true
+                    }).then((result) => {
+                        //if user clicks on delete
+                        if (result.value) {
+                            // calling destroy method to delete
+                            @this.call('revertPending',id)
+                           
+                        } else if (result.dismiss === Swal.DismissReason.cancel) {
+                            Swal.fire(
+                                'Cancelled',
+                                'Reverting cancelled :)',
                                 'error'
                             )
                         }
