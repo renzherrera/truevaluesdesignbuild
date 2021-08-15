@@ -87,7 +87,7 @@ class ViewPayroll extends Component
             IFNULL((SELECT SUM(cash_amount) FROM cash_advances WHERE employee_id = employees.id),0) as total_minus_cashadvances')
             ->havingRaw('SUM(ROUND('.$first_in.' *  '.$regular_salary_holiday.')) + 
             IFNULL(SUM(ROUND(('.$overtime_in.' )  * '.$overtime_salary_holiday.' )),0) - 
-            IFNULL((SELECT SUM(cash_amount) FROM cash_advances WHERE employee_id = employees.id),0) > 0');;
+            IFNULL((SELECT SUM(cash_amount) FROM cash_advances WHERE employee_id = employees.id),0) > 0');
 
             
             if($this->project_id && $this->project_id != 0){

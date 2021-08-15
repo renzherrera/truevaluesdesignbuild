@@ -278,7 +278,7 @@
                                 </table>
                             </div>
                                   <div class="card-footer justify-content-center">
-                                    {{$payrollSummaries->links('pagination')}}
+                                    {{$payrollSummaries->links('pagination')}}  
     
                                   </div>
                                 </div>
